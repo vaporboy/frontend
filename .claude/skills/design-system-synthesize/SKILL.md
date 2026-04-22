@@ -16,15 +16,47 @@ Get it right.
 
 ## Required inputs before you begin
 
-Before writing anything, confirm all three are available:
+Before writing anything, confirm all four are available. If any input is
+missing or incomplete, **stop and report what's missing** rather than
+proceeding with guesses.
 
-1. The latest audit report under `docs/design-system/audit-*.md`. If there
-   is more than one, use the most recent.
-2. A separate file or chat input from the team containing answers to every
-   "Open questions" item in the audit. If any are unanswered, **stop and
-   list them** rather than guessing.
-3. Read `CLAUDE.md`, `AGENTS.md`, and the current state of
-   `assets/branding/` so the doc reflects the actual tenant set.
+1. **The latest audit report** under `docs/design-system/audit-*.md`. If
+   more than one exists, use the most recent by filename date. Note the
+   exact filename in the synthesized doc's appendix A so the decision
+   trail is auditable.
+
+2. **The team decisions file** at `docs/design-system/decisions.md`. This
+   is the canonical location for answers to the audit's Section 7 open
+   questions. If the file does not exist at this path, stop and tell the
+   user — do not search for answers elsewhere or accept them inline in
+   chat, because decisions that aren't in the file aren't decisions of
+   record.
+
+3. **Current repo state** — read `CLAUDE.md`, `AGENTS.md`, and list the
+   contents of `assets/branding/` so the synthesized doc reflects the
+   actual tenant set at synthesis time, not what the audit saw.
+
+4. **Pre-flight reconciliation** — before drafting `visual-design.md`,
+   produce a short coverage check:
+
+   - For each open question in the audit's Section 7, quote the question
+     and the corresponding answer from `decisions.md`.
+   - Flag any question with no matching answer.
+   - Flag any answer that is ambiguous, deferred, or contains hedging
+     language ("probably", "TBD", "we'll decide later", "leaning toward").
+   - Flag any answer in `decisions.md` that does not correspond to an
+     audit question (stale or out-of-scope decisions are a signal
+     something is out of sync).
+
+   If any flags are raised, **stop synthesis and return the coverage
+   check as the response**. The user must update `decisions.md` before
+   synthesis can proceed. A synthesized styleguide built on hedged
+   answers will be hedged in exactly the places that matter most.
+
+   If the coverage check is clean, proceed to synthesis and include a
+   one-line confirmation in the synthesized doc's appendix A header:
+   "Reconciled against audit-YYYY-MM-DD.md Section 7: N/N questions
+   answered."
 
 ## Architectural commitments the doc must reflect
 
@@ -148,11 +180,28 @@ template).
 
 A reverse-chronological list of decisions the team has made about the
 design system, with date, the question (often pulled from an audit's
-"Open questions" section), and the answer. This is the artifact that
-explains *why* the doc says what it says, six months from now when
-nobody remembers the meeting.
+"Open questions" section), the answer, and — where recorded in
+`decisions.md` — the rationale. This is the artifact that explains
+*why* the doc says what it says, six months from now when nobody
+remembers the meeting.
 
-Seed this with the answers to the most recent audit's open questions.
+The appendix must open with a header block that records:
+
+- The audit filename the decisions answer (e.g.,
+  `docs/design-system/audit-2026-04-22.md`).
+- The reconciliation confirmation produced by the pre-flight check in
+  "Required inputs", e.g., "Reconciled against audit-2026-04-22.md
+  Section 7: 12/12 questions answered."
+- The decision date and decision-makers, pulled from the header of
+  `decisions.md`.
+
+Then list each decision with a stable ID (Q1, Q2, ...) matching the
+numbering in the source audit's Section 7, so future audits can
+reference "Q7 from 2026-04-22" without ambiguity.
+
+Seed this with the full contents of `docs/design-system/decisions.md`,
+preserving every rationale. Do not paraphrase; decisions of record
+must survive verbatim.
 
 ## What this skill must not do
 
