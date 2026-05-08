@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:soliplex_agent/soliplex_agent.dart';
 
+import '../../../../design/tokens/spacing.dart';
+
 import 'expandable_list_card.dart';
 import 'room_info_widgets.dart';
 
@@ -18,7 +20,7 @@ class ClientToolsCard extends StatelessWidget {
             title: 'CLIENT TOOLS',
             children: [
               Padding(
-                padding: EdgeInsets.all(16),
+                padding: EdgeInsets.all(SoliplexSpacing.s4),
                 child: Center(child: CircularProgressIndicator()),
               ),
             ],

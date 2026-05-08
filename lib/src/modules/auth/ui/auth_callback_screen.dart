@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../design/tokens/spacing.dart';
 import '../auth_providers.dart';
 import '../auth_tokens.dart';
 import '../platform/callback_params.dart';
@@ -96,22 +97,24 @@ class _AuthCallbackScreenState extends ConsumerState<AuthCallbackScreen> {
   @override
   Widget build(BuildContext context) {
     if (_processing && _error == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(SoliplexSpacing.s4),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.error_outline, size: 48, color: Colors.red),
-              const SizedBox(height: 16),
+              Icon(
+                Icons.error_outline,
+                size: 48,
+                color: Theme.of(context).colorScheme.error,
+              ),
+              const SizedBox(height: SoliplexSpacing.s4),
               Text(_error ?? 'An error occurred'),
-              const SizedBox(height: 16),
+              const SizedBox(height: SoliplexSpacing.s4),
               FilledButton(
                 onPressed: () => context.go('/'),
                 child: const Text('Back to home'),

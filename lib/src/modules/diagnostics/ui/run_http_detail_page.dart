@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../../../design/tokens/spacing.dart';
 import '../models/http_event_group.dart';
 import 'http_event_tile.dart';
 import 'request_detail_view.dart';
 
 class RunHttpDetailPage extends StatelessWidget {
-  const RunHttpDetailPage({
-    required this.groups,
-    super.key,
-  });
+  const RunHttpDetailPage({required this.groups, super.key});
 
   final List<HttpEventGroup> groups;
 
@@ -42,7 +40,7 @@ class RunHttpDetailPage extends StatelessWidget {
             size: 48,
             color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: SoliplexSpacing.s3),
           Text(
             'No HTTP traffic found for this run',
             style: theme.textTheme.bodyMedium?.copyWith(
@@ -65,7 +63,7 @@ class _MultiGroupView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text('HTTP Traffic (${groups.length})')),
       body: ListView.separated(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.symmetric(vertical: SoliplexSpacing.s2),
         itemCount: groups.length,
         separatorBuilder: (_, __) => const Divider(height: 1),
         itemBuilder: (context, index) {

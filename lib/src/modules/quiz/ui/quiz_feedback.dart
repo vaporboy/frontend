@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:soliplex_client/soliplex_client.dart';
 
+import '../../../design/tokens/radii.dart';
+import '../../../design/tokens/spacing.dart';
+
 class QuizAnswerFeedback extends StatelessWidget {
   const QuizAnswerFeedback({super.key, required this.result});
   final QuizAnswerResult result;
@@ -12,12 +15,12 @@ class QuizAnswerFeedback extends StatelessWidget {
     final isCorrect = result.isCorrect;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(SoliplexSpacing.s4),
       decoration: BoxDecoration(
         color: isCorrect
             ? colorScheme.primaryContainer
             : colorScheme.errorContainer,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(soliplexRadii.sm),
       ),
       child: Row(
         children: [
@@ -25,7 +28,7 @@ class QuizAnswerFeedback extends StatelessWidget {
             isCorrect ? Icons.check_circle : Icons.cancel,
             color: isCorrect ? colorScheme.primary : colorScheme.error,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: SoliplexSpacing.s2),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -71,15 +74,15 @@ class QuizErrorFeedback extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(SoliplexSpacing.s4),
       decoration: BoxDecoration(
         color: colorScheme.errorContainer,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(soliplexRadii.sm),
       ),
       child: Row(
         children: [
           Icon(Icons.error_outline, color: colorScheme.error),
-          const SizedBox(width: 8),
+          const SizedBox(width: SoliplexSpacing.s2),
           Expanded(
             child: Text(
               message,

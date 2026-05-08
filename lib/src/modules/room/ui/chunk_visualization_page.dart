@@ -3,6 +3,7 @@ import 'dart:math' show min;
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import '../../../design/tokens/spacing.dart';
 import 'package:soliplex_client/soliplex_client.dart' show SoliplexApi;
 
 @visibleForTesting
@@ -85,9 +86,9 @@ class ChunkVisualizationPage extends StatefulWidget {
       );
     }
 
-    return Navigator.of(context).push<void>(
-      MaterialPageRoute(builder: (_) => child),
-    );
+    return Navigator.of(
+      context,
+    ).push<void>(MaterialPageRoute(builder: (_) => child));
   }
 
   @override
@@ -115,11 +116,13 @@ class _ChunkVisualizationPageState extends State<ChunkVisualizationPage> {
   void _loadVisualization() {
     _future = widget.api
         .getChunkVisualization(widget.roomId, widget.chunkId)
-        .then((viz) => viz.imagesBase64.map((b64) {
-              final bytes = base64Decode(b64);
-              final (w, h) = readPngDimensions(bytes);
-              return PageImage(bytes, w, h);
-            }).toList());
+        .then(
+          (viz) => viz.imagesBase64.map((b64) {
+            final bytes = base64Decode(b64);
+            final (w, h) = readPngDimensions(bytes);
+            return PageImage(bytes, w, h);
+          }).toList(),
+        );
   }
 
   void _retry() {
@@ -165,7 +168,7 @@ class _ChunkVisualizationPageState extends State<ChunkVisualizationPage> {
   Widget build(BuildContext context) {
     if (widget.useDialogLayout) {
       return Dialog(
-        insetPadding: const EdgeInsets.all(16),
+        insetPadding: EdgeInsets.all(SoliplexSpacing.s4),
         child: ConstrainedBox(
           constraints: BoxConstraints(
             maxWidth: 800,
@@ -194,7 +197,12 @@ class _ChunkVisualizationPageState extends State<ChunkVisualizationPage> {
   Widget _buildTitleBar(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 8, 8),
+      padding: EdgeInsets.fromLTRB(
+        SoliplexSpacing.s4,
+        SoliplexSpacing.s3,
+        SoliplexSpacing.s2,
+        SoliplexSpacing.s2,
+      ),
       child: Row(
         children: [
           Expanded(
@@ -221,7 +229,7 @@ class _ChunkVisualizationPageState extends State<ChunkVisualizationPage> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.error_outline, size: 48, color: theme.colorScheme.error),
-          const SizedBox(height: 12),
+          SizedBox(height: SoliplexSpacing.s3),
           Text(
             'Failed to load visualization',
             style: theme.textTheme.bodyMedium,
@@ -234,7 +242,7 @@ class _ChunkVisualizationPageState extends State<ChunkVisualizationPage> {
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: SoliplexSpacing.s4),
           FilledButton.icon(
             onPressed: _retry,
             icon: const Icon(Icons.refresh),
@@ -253,11 +261,7 @@ class _ChunkVisualizationPageState extends State<ChunkVisualizationPage> {
 
     if (!page.hasDimensions) {
       return Center(
-        child: InteractiveViewer(
-          minScale: 1.0,
-          maxScale: 4.0,
-          child: image,
-        ),
+        child: InteractiveViewer(minScale: 1.0, maxScale: 4.0, child: image),
       );
     }
 
@@ -304,8 +308,8 @@ class _ChunkVisualizationPageState extends State<ChunkVisualizationPage> {
                 children: [
                   _buildPageImage(page, rotation),
                   Positioned(
-                    right: 8,
-                    top: 8,
+                    right: SoliplexSpacing.s2,
+                    top: SoliplexSpacing.s2,
                     child: IconButton.filledTonal(
                       onPressed: () => _rotate(index),
                       icon: const Icon(Icons.rotate_right),
@@ -318,7 +322,7 @@ class _ChunkVisualizationPageState extends State<ChunkVisualizationPage> {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          padding: EdgeInsets.symmetric(vertical: SoliplexSpacing.s2),
           child: Column(
             children: [
               Text(
@@ -336,10 +340,8 @@ class _ChunkVisualizationPageState extends State<ChunkVisualizationPage> {
                         radius: 4,
                         backgroundColor: index == _currentPage
                             ? Theme.of(context).colorScheme.primary
-                            : Theme.of(context)
-                                .colorScheme
-                                .onSurfaceVariant
-                                .withValues(alpha: 0.3),
+                            : Theme.of(context).colorScheme.onSurfaceVariant
+                                  .withValues(alpha: 0.3),
                       ),
                     );
                   }),

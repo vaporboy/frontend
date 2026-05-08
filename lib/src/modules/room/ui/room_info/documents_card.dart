@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:soliplex_client/soliplex_client.dart' hide State;
 
+import '../../../../design/tokens/radii.dart';
+import '../../../../design/tokens/spacing.dart';
+import '../../../../design/tokens/typography_x.dart';
 import '../../../../shared/file_type_icons.dart';
 import 'room_info_widgets.dart';
 
@@ -48,8 +51,8 @@ class _DocumentsCardState extends State<DocumentsCard> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           title = 'DOCUMENTS';
           children = [
-            const Padding(
-              padding: EdgeInsets.all(16),
+            Padding(
+              padding: EdgeInsets.all(SoliplexSpacing.s4),
               child: Center(child: CircularProgressIndicator()),
             ),
           ];
@@ -63,11 +66,13 @@ class _DocumentsCardState extends State<DocumentsCard> {
                   size: 18,
                   color: theme.colorScheme.error,
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: SoliplexSpacing.s2),
                 Expanded(
                   child: Text(
                     'Failed to load documents',
-                    style: TextStyle(color: theme.colorScheme.error),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.error,
+                    ),
                   ),
                 ),
                 FilledButton(
@@ -97,7 +102,7 @@ class _DocumentsCardState extends State<DocumentsCard> {
             children = [
               if (docs.length > 1)
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
+                  padding: EdgeInsets.only(bottom: SoliplexSpacing.s2),
                   child: TextField(
                     controller: _searchController,
                     decoration: InputDecoration(
@@ -115,9 +120,9 @@ class _DocumentsCardState extends State<DocumentsCard> {
                           : null,
                       isDense: true,
                       border: const OutlineInputBorder(),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: SoliplexSpacing.s3,
+                        vertical: SoliplexSpacing.s2,
                       ),
                     ),
                     onChanged: (value) => setState(() => _searchQuery = value),
@@ -139,19 +144,12 @@ class _DocumentsCardState extends State<DocumentsCard> {
           }
         }
 
-        return SectionCard(
-          title: title,
-          children: children,
-        );
+        return SectionCard(title: title, children: children);
       },
     );
   }
 
-  Widget _buildDocTile(
-    RagDocument doc,
-    bool expanded,
-    ThemeData theme,
-  ) {
+  Widget _buildDocTile(RagDocument doc, bool expanded, ThemeData theme) {
     return GestureDetector(
       onTap: () => setState(() {
         if (expanded) {
@@ -168,11 +166,8 @@ class _DocumentsCardState extends State<DocumentsCard> {
           children: [
             Row(
               children: [
-                Icon(
-                  getFileTypeIcon(documentIconPath(doc)),
-                  size: 22,
-                ),
-                const SizedBox(width: 8),
+                Icon(getFileTypeIcon(documentIconPath(doc)), size: 22),
+                SizedBox(width: SoliplexSpacing.s2),
                 Expanded(
                   child: Text(
                     documentDisplayName(doc),
@@ -215,10 +210,10 @@ class _DocumentsCardState extends State<DocumentsCard> {
       padding: const EdgeInsets.only(top: 4),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(8),
+        padding: EdgeInsets.all(SoliplexSpacing.s2),
         decoration: BoxDecoration(
           color: colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(soliplexRadii.sm),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -227,23 +222,23 @@ class _DocumentsCardState extends State<DocumentsCard> {
             const SizedBox(height: 2),
             SelectableText(
               doc.id,
-              style: valueStyle?.copyWith(fontFamily: 'monospace'),
+              style: context.monospace.copyWith(fontSize: 13),
             ),
             if (doc.uri.isNotEmpty || dateFields.isNotEmpty)
-              const SizedBox(height: 8),
+              SizedBox(height: SoliplexSpacing.s2),
             if (doc.uri.isNotEmpty) ...[
               Text('uri', style: labelStyle),
               const SizedBox(height: 2),
               SelectableText(
                 doc.uri,
-                style: valueStyle?.copyWith(fontFamily: 'monospace'),
+                style: context.monospace.copyWith(fontSize: 13),
               ),
-              if (dateFields.isNotEmpty) const SizedBox(height: 8),
+              if (dateFields.isNotEmpty) SizedBox(height: SoliplexSpacing.s2),
             ],
             if (dateFields.isNotEmpty)
               Wrap(
-                spacing: 16,
-                runSpacing: 8,
+                spacing: SoliplexSpacing.s4,
+                runSpacing: SoliplexSpacing.s2,
                 children: [
                   for (final (label, value) in dateFields)
                     SizedBox(
@@ -253,10 +248,7 @@ class _DocumentsCardState extends State<DocumentsCard> {
                         children: [
                           Text(label, style: labelStyle),
                           const SizedBox(height: 2),
-                          SelectableText(
-                            value,
-                            style: valueStyle,
-                          ),
+                          SelectableText(value, style: valueStyle),
                         ],
                       ),
                     ),
@@ -268,9 +260,9 @@ class _DocumentsCardState extends State<DocumentsCard> {
                 child: TextButton(
                   style: TextButton.styleFrom(
                     textStyle: theme.textTheme.labelSmall,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: SoliplexSpacing.s4,
+                      vertical: SoliplexSpacing.s2,
                     ),
                   ),
                   onPressed: () => showDialog<void>(
@@ -314,11 +306,7 @@ class MetadataDialog extends StatelessWidget {
     final entries = metadata.entries.toList();
 
     return AlertDialog(
-      title: Text(
-        title,
-        overflow: TextOverflow.ellipsis,
-        maxLines: 1,
-      ),
+      title: Text(title, overflow: TextOverflow.ellipsis, maxLines: 1),
       content: SizedBox(
         width: double.maxFinite,
         child: SingleChildScrollView(
@@ -331,7 +319,7 @@ class MetadataDialog extends StatelessWidget {
                   child: Card(
                     margin: EdgeInsets.zero,
                     child: Padding(
-                      padding: const EdgeInsets.all(12),
+                      padding: EdgeInsets.all(SoliplexSpacing.s3),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -346,13 +334,15 @@ class MetadataDialog extends StatelessWidget {
                           formatDynamicValue(
                             entry.value,
                             style: theme.textTheme.bodySmall,
+                            context: context,
                           ),
                         ],
                       ),
                     ),
                   ),
                 ),
-                if (entry.key != entries.last.key) const SizedBox(height: 8),
+                if (entry.key != entries.last.key)
+                  SizedBox(height: SoliplexSpacing.s2),
               ],
             ],
           ),

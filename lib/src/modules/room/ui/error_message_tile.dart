@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:soliplex_agent/soliplex_agent.dart';
 
+import '../../../design/tokens/radii.dart';
 import 'copy_button.dart';
 
 class ErrorMessageTile extends StatelessWidget {
@@ -17,7 +18,7 @@ class ErrorMessageTile extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           decoration: BoxDecoration(
             color: theme.colorScheme.errorContainer,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(soliplexRadii.md),
           ),
           child: SelectableText(
             message.errorText,

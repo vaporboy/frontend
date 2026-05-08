@@ -7,6 +7,7 @@ import '../execution_tracker.dart';
 import '../tracker_registry.dart' show awaitingTrackerKey;
 import '../run_id_resolver.dart';
 import '../source_references_resolver.dart';
+import '../../../design/tokens/spacing.dart';
 import 'message_tile.dart';
 import 'scroll/anchored_scroll_controller.dart';
 import 'scroll/scroll_to_bottom.dart';
@@ -30,7 +31,7 @@ class MessageTimeline extends StatefulWidget {
   final StreamingState? streamingState;
   final Map<String, ExecutionTracker> executionTrackers;
   final void Function(String runId, FeedbackType feedback, String? reason)?
-      onFeedbackSubmit;
+  onFeedbackSubmit;
   final void Function(String runId)? onInspect;
   final void Function(SourceReference)? onShowChunkVisualization;
 
@@ -80,8 +81,10 @@ class _MessageTimelineState extends State<MessageTimeline> {
 
   void _recomputeMaps() {
     _runIdMap = buildRunIdMap(widget.messages, widget.messageStates);
-    _sourceReferencesMap =
-        buildSourceReferencesMap(widget.messages, widget.messageStates);
+    _sourceReferencesMap = buildSourceReferencesMap(
+      widget.messages,
+      widget.messageStates,
+    );
   }
 
   @override
@@ -178,54 +181,62 @@ class _MessageTimelineState extends State<MessageTimeline> {
 
     return Stack(
       children: [
-        CustomScrollView(
-          controller: _scrollController,
-          slivers: [
-            SliverPadding(
-              padding: const EdgeInsets.all(16),
-              sliver: SliverList.builder(
-                itemCount: displayMessages.length,
-                itemBuilder: (context, index) {
-                  final message = displayMessages[index];
-                  final isLastItem = index == displayMessages.length - 1;
-                  // A distinct key for the loading sentinel forces a
-                  // remount at the AwaitingText → TextStreaming transition.
-                  // Children capture their MessageExpansion handle once in
-                  // initState; without the remount they would stay bound to
-                  // loadingMessageId (which forMessage rejects) and never
-                  // acquire a handle under the real messageId.
-                  return Padding(
-                    key: message is LoadingMessage
-                        ? const ValueKey('loading')
-                        : _keyFor(message.id),
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: MessageTile(
-                      roomId: widget.roomId,
-                      message: message,
-                      runId: _runIdMap[message.id] ??
-                          (message is TextMessage &&
-                                  message.user == ChatUser.user
-                              ? widget.messageStates[message.id]?.runId
-                              : null),
-                      sourceReferences: _sourceReferencesMap[message.id],
-                      onFeedbackSubmit: widget.onFeedbackSubmit,
-                      onInspect: widget.onInspect,
-                      onShowChunkVisualization: widget.onShowChunkVisualization,
-                      executionTracker: widget.executionTrackers[message.id] ??
-                          (message is LoadingMessage
-                              ? widget.executionTrackers[awaitingTrackerKey]
-                              : null),
-                      streamingActivity: isLastItem ? streamingActivity : null,
-                    ),
-                  );
-                },
+        Semantics(
+          liveRegion: true,
+          child: CustomScrollView(
+            controller: _scrollController,
+            slivers: [
+              SliverPadding(
+                padding: EdgeInsets.all(SoliplexSpacing.s4),
+                sliver: SliverList.builder(
+                  itemCount: displayMessages.length,
+                  itemBuilder: (context, index) {
+                    final message = displayMessages[index];
+                    final isLastItem = index == displayMessages.length - 1;
+                    // A distinct key for the loading sentinel forces a
+                    // remount at the AwaitingText → TextStreaming transition.
+                    // Children capture their MessageExpansion handle once in
+                    // initState; without the remount they would stay bound to
+                    // loadingMessageId (which forMessage rejects) and never
+                    // acquire a handle under the real messageId.
+                    return Padding(
+                      key: message is LoadingMessage
+                          ? const ValueKey('loading')
+                          : _keyFor(message.id),
+                      padding: EdgeInsets.only(bottom: SoliplexSpacing.s4),
+                      child: MessageTile(
+                        roomId: widget.roomId,
+                        message: message,
+                        runId:
+                            _runIdMap[message.id] ??
+                            (message is TextMessage &&
+                                    message.user == ChatUser.user
+                                ? widget.messageStates[message.id]?.runId
+                                : null),
+                        sourceReferences: _sourceReferencesMap[message.id],
+                        onFeedbackSubmit: widget.onFeedbackSubmit,
+                        onInspect: widget.onInspect,
+                        onShowChunkVisualization:
+                            widget.onShowChunkVisualization,
+                        executionTracker:
+                            widget.executionTrackers[message.id] ??
+                            (message is LoadingMessage
+                                ? widget.executionTrackers[awaitingTrackerKey]
+                                : null),
+                        streamingActivity: isLastItem
+                            ? streamingActivity
+                            : null,
+                      ),
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         Positioned(
-          right: 16,
-          bottom: 16,
+          right: SoliplexSpacing.s4,
+          bottom: SoliplexSpacing.s4,
           child: ScrollToBottomButton(
             controller: _scrollToBottomController,
             onPressed: _onScrollToBottom,

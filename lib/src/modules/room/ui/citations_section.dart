@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:soliplex_agent/soliplex_agent.dart' hide State;
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../design/tokens/radii.dart';
+import '../../../design/tokens/spacing.dart';
 import 'markdown/flutter_markdown_plus_renderer.dart';
 
 class CitationsSection extends StatefulWidget {
@@ -30,10 +32,10 @@ class _CitationsSectionState extends State<CitationsSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 8),
+        SizedBox(height: SoliplexSpacing.s2),
         InkWell(
           onTap: () => setState(() => _sectionExpanded = !_sectionExpanded),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(soliplexRadii.sm),
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
             child: Row(
@@ -114,7 +116,7 @@ class _SourceReferenceRow extends StatelessWidget {
         children: [
           InkWell(
             onTap: onToggle,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(soliplexRadii.sm),
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 4),
               child: Row(
@@ -135,7 +137,7 @@ class _SourceReferenceRow extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: SoliplexSpacing.s2),
                   Expanded(
                     child: Text(
                       sourceReference.displayTitle,
@@ -170,7 +172,10 @@ class _SourceReferenceRow extends StatelessWidget {
 
   Widget _buildExpandedContent(BuildContext context, ThemeData theme) {
     return Padding(
-      padding: const EdgeInsets.only(left: 32, bottom: 8),
+      padding: EdgeInsets.only(
+        left: SoliplexSpacing.s8,
+        bottom: SoliplexSpacing.s2,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -189,10 +194,10 @@ class _SourceReferenceRow extends StatelessWidget {
           if (sourceReference.content.isNotEmpty)
             Container(
               constraints: const BoxConstraints(maxHeight: 250),
-              padding: const EdgeInsets.all(8),
+              padding: EdgeInsets.all(SoliplexSpacing.s2),
               decoration: BoxDecoration(
                 color: theme.colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(soliplexRadii.md),
               ),
               child: SingleChildScrollView(
                 child: FlutterMarkdownPlusRenderer(
@@ -224,7 +229,7 @@ class _SourceReferenceRow extends StatelessWidget {
                 icon: const Icon(Icons.picture_as_pdf, size: 16),
                 label: const Text('View in PDF'),
                 style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  padding: EdgeInsets.symmetric(horizontal: SoliplexSpacing.s2),
                   minimumSize: Size.zero,
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../design/tokens/spacing.dart';
 import '../models/format_utils.dart';
 import '../models/http_event_group.dart';
 import 'http_status_display.dart';
@@ -26,8 +27,8 @@ class HttpEventTile extends StatelessWidget {
       label: group.semanticLabel,
       child: Padding(
         padding: EdgeInsets.symmetric(
-          horizontal: dense ? 8 : 12,
-          vertical: dense ? 6 : 8,
+          horizontal: dense ? SoliplexSpacing.s2 : SoliplexSpacing.s3,
+          vertical: dense ? 6 : SoliplexSpacing.s2,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -52,9 +53,9 @@ class HttpEventTile extends StatelessWidget {
     final methodStyle =
         (dense ? theme.textTheme.bodySmall : theme.textTheme.bodyMedium)
             ?.copyWith(
-      fontWeight: FontWeight.bold,
-      color: isSelected ? selectedColor : colorScheme.primary,
-    );
+              fontWeight: FontWeight.bold,
+              color: isSelected ? selectedColor : colorScheme.primary,
+            );
 
     final pathStyle =
         (dense ? theme.textTheme.bodySmall : theme.textTheme.bodyMedium)

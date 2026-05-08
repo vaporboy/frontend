@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:soliplex_frontend/src/design/theme/theme_extensions.dart';
 import 'package:soliplex_frontend/src/modules/room/upload_tracker.dart';
 
 /// Transient inline notifications that announce upload transitions the
@@ -47,7 +48,8 @@ class _UploadEventBannerState extends State<UploadEventBanner> {
   @override
   void didUpdateWidget(covariant UploadEventBanner oldWidget) {
     super.didUpdateWidget(oldWidget);
-    final scopeChanged = oldWidget.tracker != widget.tracker ||
+    final scopeChanged =
+        oldWidget.tracker != widget.tracker ||
         oldWidget.roomId != widget.roomId ||
         oldWidget.threadId != widget.threadId;
     if (!scopeChanged) return;
@@ -183,7 +185,7 @@ class _UploadEventBannerState extends State<UploadEventBanner> {
     }
     final message = _failures.length == 1
         ? 'Failed to upload ${_failures.first.filename}: '
-            '${_failures.first.message}'
+              '${_failures.first.message}'
         : 'Failed to upload ${_failures.length} files';
     return _Pill(
       key: ValueKey('failure:$message'),
@@ -202,14 +204,12 @@ class _UploadEventBannerState extends State<UploadEventBanner> {
     final message = _successes.length == 1
         ? 'Uploaded ${_successes.first}'
         : 'Uploaded ${_successes.first} and ${_successes.length - 1} more';
-    // Material doesn't have a "success" color token; use light-green
-    // Material shades so success reads distinctly from the primary
-    // color without competing with the errorContainer on failures.
+    final soliplex = SoliplexTheme.of(context);
     return _Pill(
       key: ValueKey('success:$message'),
       icon: Icons.check_circle_outline,
-      background: Colors.green.shade100,
-      foreground: Colors.green.shade900,
+      background: soliplex.colors.success.withAlpha(25),
+      foreground: soliplex.colors.success,
       message: message,
       onDismiss: _dismissSuccesses,
     );
@@ -264,10 +264,9 @@ class _Pill extends StatelessWidget {
           Flexible(
             child: Text(
               message,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodySmall
-                  ?.copyWith(color: foreground),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: foreground),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -278,7 +277,7 @@ class _Pill extends StatelessWidget {
             color: foreground,
             onPressed: onDismiss,
             padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
+            constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
             visualDensity: VisualDensity.compact,
           ),
         ],

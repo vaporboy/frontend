@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:soliplex_agent/soliplex_agent.dart'
     show fetchOidcDiscoveryDocument;
 
+import '../../../design/tokens/spacing.dart';
 import '../auth_providers.dart';
 import '../auth_tokens.dart';
 import '../server_entry.dart';
@@ -77,7 +78,12 @@ class _ServerListScreenState extends ConsumerState<ServerListScreen> {
 
   Widget _sectionHeader(ThemeData theme, String label) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+      padding: const EdgeInsets.fromLTRB(
+        SoliplexSpacing.s4,
+        SoliplexSpacing.s4,
+        SoliplexSpacing.s4,
+        4,
+      ),
       child: Text(
         label,
         style: theme.textTheme.titleSmall?.copyWith(
@@ -99,10 +105,7 @@ class _ServerListScreenState extends ConsumerState<ServerListScreen> {
               child: const Text('Log out'),
             ),
           IconButton(
-            icon: Icon(
-              Icons.delete_outline,
-              color: theme.colorScheme.error,
-            ),
+            icon: Icon(Icons.delete_outline, color: theme.colorScheme.error),
             onPressed: () async {
               await _logout(entry);
               widget.serverManager.removeServer(entry.serverId);
@@ -128,10 +131,7 @@ class _ServerListScreenState extends ConsumerState<ServerListScreen> {
             child: const Text('Sign in'),
           ),
           IconButton(
-            icon: Icon(
-              Icons.delete_outline,
-              color: theme.colorScheme.error,
-            ),
+            icon: Icon(Icons.delete_outline, color: theme.colorScheme.error),
             onPressed: () => widget.serverManager.removeServer(entry.serverId),
           ),
         ],
@@ -158,8 +158,11 @@ class _ServerListScreenState extends ConsumerState<ServerListScreen> {
         );
         endSessionEndpoint = discovery.endSessionEndpoint?.toString();
       } catch (e, st) {
-        dev.log('OIDC discovery failed during logout',
-            error: e, stackTrace: st);
+        dev.log(
+          'OIDC discovery failed during logout',
+          error: e,
+          stackTrace: st,
+        );
       }
       if (!mounted) return;
       await authFlow.endSession(

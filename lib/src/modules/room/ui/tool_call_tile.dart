@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:soliplex_agent/soliplex_agent.dart';
 
+import '../../../design/tokens/spacing.dart';
+import '../../../design/tokens/typography_x.dart';
+
 class ToolCallTile extends StatelessWidget {
   const ToolCallTile({super.key, required this.message});
   final ToolCallMessage message;
@@ -35,11 +38,12 @@ class _ToolCallCard extends StatelessWidget {
                 toolCall.name,
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
-                style: theme.textTheme.bodyMedium
-                    ?.copyWith(fontWeight: FontWeight.w500),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: SoliplexSpacing.s2),
             Text(
               toolCall.status.name,
               style: theme.textTheme.labelSmall?.copyWith(
@@ -69,7 +73,12 @@ class _CodeBlock extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+      padding: EdgeInsets.fromLTRB(
+        SoliplexSpacing.s4,
+        0,
+        SoliplexSpacing.s4,
+        SoliplexSpacing.s2,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -80,10 +89,7 @@ class _CodeBlock extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          SelectableText(
-            text,
-            style: theme.textTheme.bodySmall?.copyWith(fontFamily: 'monospace'),
-          ),
+          SelectableText(text, style: context.monospace.copyWith(fontSize: 13)),
         ],
       ),
     );

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../design/tokens/spacing.dart';
+import '../../../design/tokens/typography_x.dart';
 import '../models/json_tree_model.dart';
 
 /// Renders a [List<JsonNode>] as an expandable tree with syntax coloring.
@@ -13,11 +15,11 @@ class JsonTreeView extends StatelessWidget {
     if (nodes.isEmpty) {
       return Text(
         '(empty)',
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              fontFamily: 'monospace',
-              fontStyle: FontStyle.italic,
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
+        style: context.monospace.copyWith(
+          fontSize: 13,
+          fontStyle: FontStyle.italic,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+        ),
       );
     }
     return _JsonNodeList(nodes: nodes, depth: 0);
@@ -57,30 +59,30 @@ class _JsonNodeTileState extends State<_JsonNodeTile> {
   @override
   Widget build(BuildContext context) {
     final node = widget.node;
-    final indent = widget.depth * 16.0;
+    final indent = widget.depth * SoliplexSpacing.s4;
 
     return switch (node) {
       ValueNode() => _buildValueRow(context, node, indent),
       ObjectNode() => _buildExpandable(
-          context,
-          node,
-          indent,
-          label: node.key.isEmpty ? '{…}' : '${node.key}: {…}',
-          expandedLabel: node.key.isEmpty ? '{' : '${node.key}: {',
-          closingLabel: '}',
-          children: node.children,
-        ),
+        context,
+        node,
+        indent,
+        label: node.key.isEmpty ? '{…}' : '${node.key}: {…}',
+        expandedLabel: node.key.isEmpty ? '{' : '${node.key}: {',
+        closingLabel: '}',
+        children: node.children,
+      ),
       ArrayNode() => _buildExpandable(
-          context,
-          node,
-          indent,
-          label: node.key.isEmpty
-              ? '[${node.itemCount}]'
-              : '${node.key}: [${node.itemCount}]',
-          expandedLabel: node.key.isEmpty ? '[' : '${node.key}: [',
-          closingLabel: ']',
-          children: node.children,
-        ),
+        context,
+        node,
+        indent,
+        label: node.key.isEmpty
+            ? '[${node.itemCount}]'
+            : '${node.key}: [${node.itemCount}]',
+        expandedLabel: node.key.isEmpty ? '[' : '${node.key}: [',
+        closingLabel: ']',
+        children: node.children,
+      ),
     };
   }
 
@@ -99,9 +101,7 @@ class _JsonNodeTileState extends State<_JsonNodeTile> {
       if (asDouble != null) valueColor = colorScheme.primary;
     }
 
-    final baseStyle = theme.textTheme.bodySmall?.copyWith(
-      fontFamily: 'monospace',
-    );
+    final baseStyle = context.monospace.copyWith(fontSize: 13);
 
     return Padding(
       padding: EdgeInsets.only(left: indent),
@@ -111,13 +111,11 @@ class _JsonNodeTileState extends State<_JsonNodeTile> {
             if (node.key.isNotEmpty)
               TextSpan(
                 text: '${node.key}: ',
-                style: baseStyle?.copyWith(
-                  color: colorScheme.onSurface,
-                ),
+                style: baseStyle.copyWith(color: colorScheme.onSurface),
               ),
             TextSpan(
               text: node.value,
-              style: baseStyle?.copyWith(color: valueColor),
+              style: baseStyle.copyWith(color: valueColor),
             ),
           ],
         ),
@@ -136,9 +134,7 @@ class _JsonNodeTileState extends State<_JsonNodeTile> {
   }) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final baseStyle = theme.textTheme.bodySmall?.copyWith(
-      fontFamily: 'monospace',
-    );
+    final baseStyle = context.monospace.copyWith(fontSize: 13);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

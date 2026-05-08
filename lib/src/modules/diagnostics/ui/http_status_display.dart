@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../../design/color/color_scheme_extensions.dart';
+import '../../../design/theme/theme_extensions.dart';
+import '../../../design/tokens/colors.dart';
+import '../../../design/tokens/spacing.dart';
 import '../models/format_utils.dart';
 import '../models/http_event_group.dart';
 
@@ -21,9 +23,10 @@ class HttpStatusDisplay extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final soliplex = SoliplexTheme.of(context);
     final color = isSelected
         ? colorScheme.onPrimaryContainer
-        : _colorForStatus(group.status, colorScheme);
+        : _colorForStatus(group.status, colorScheme, soliplex.colors);
     final statusText = _buildStatusText();
 
     final child = group.hasSpinner
@@ -36,15 +39,19 @@ class HttpStatusDisplay extends StatelessWidget {
     );
   }
 
-  Color _colorForStatus(HttpEventStatus status, ColorScheme colorScheme) {
+  Color _colorForStatus(
+    HttpEventStatus status,
+    ColorScheme colorScheme,
+    SoliplexColors colors,
+  ) {
     return switch (status) {
       HttpEventStatus.pending => colorScheme.onSurfaceVariant,
-      HttpEventStatus.success => colorScheme.success,
-      HttpEventStatus.clientError => colorScheme.warning,
+      HttpEventStatus.success => colors.success,
+      HttpEventStatus.clientError => colors.warning,
       HttpEventStatus.serverError => colorScheme.error,
       HttpEventStatus.networkError => colorScheme.error,
       HttpEventStatus.streaming => colorScheme.secondary,
-      HttpEventStatus.streamComplete => colorScheme.success,
+      HttpEventStatus.streamComplete => colors.success,
       HttpEventStatus.streamError => colorScheme.error,
     };
   }
@@ -89,7 +96,7 @@ class HttpStatusDisplay extends StatelessWidget {
             color: color,
           ),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: SoliplexSpacing.s2),
         Text(
           text,
           style: theme.textTheme.bodySmall?.copyWith(

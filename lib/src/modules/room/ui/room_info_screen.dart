@@ -19,6 +19,7 @@ import 'room_info/features_card.dart';
 import 'room_info/quizzes_card.dart';
 import 'room_info/room_info_widgets.dart';
 import 'room_info/skill_card.dart';
+import '../../../design/tokens/spacing.dart';
 import 'room_info/system_prompt_viewer.dart';
 
 class RoomInfoScreen extends StatefulWidget {
@@ -51,8 +52,10 @@ class _RoomInfoScreenState extends State<RoomInfoScreen> {
     _cancelToken = CancelToken();
     final api = widget.serverEntry.connection.api;
     _roomFuture = api.getRoom(widget.roomId, cancelToken: _cancelToken);
-    _documentsFuture =
-        api.getDocuments(widget.roomId, cancelToken: _cancelToken)..ignore();
+    _documentsFuture = api.getDocuments(
+      widget.roomId,
+      cancelToken: _cancelToken,
+    )..ignore();
     _clientToolsFuture = widget
         .toolRegistryResolver(widget.roomId)
         .then((r) => r.toolDefinitions);
@@ -68,9 +71,10 @@ class _RoomInfoScreenState extends State<RoomInfoScreen> {
     setState(() {
       _cancelToken.cancel('retry');
       _cancelToken = CancelToken();
-      _documentsFuture = widget.serverEntry.connection.api
-          .getDocuments(widget.roomId, cancelToken: _cancelToken)
-        ..ignore();
+      _documentsFuture = widget.serverEntry.connection.api.getDocuments(
+        widget.roomId,
+        cancelToken: _cancelToken,
+      )..ignore();
     });
   }
 
@@ -85,9 +89,7 @@ class _RoomInfoScreenState extends State<RoomInfoScreen> {
             if (context.canPop()) {
               context.pop();
             } else {
-              context.go(
-                '/room/${widget.serverEntry.alias}/${widget.roomId}',
-              );
+              context.go('/room/${widget.serverEntry.alias}/${widget.roomId}');
             }
           },
         ),
@@ -151,51 +153,45 @@ class _RoomInfoBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(SoliplexSpacing.s4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: const EdgeInsets.only(bottom: 16),
+            padding: EdgeInsets.only(bottom: SoliplexSpacing.s4),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Server',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
+                Text('Server', style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: 4),
                 Text(
                   formatServerUrl(serverUrl),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ],
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(bottom: 16),
+            padding: EdgeInsets.only(bottom: SoliplexSpacing.s4),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Room',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
+                Text('Room', style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: 4),
                 Text(
                   room.name,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ],
             ),
           ),
           if (room.hasDescription)
             Padding(
-              padding: const EdgeInsets.only(bottom: 16),
+              padding: EdgeInsets.only(bottom: SoliplexSpacing.s4),
               child: Text(
                 room.description,
                 style: Theme.of(context).textTheme.bodyLarge,
@@ -209,9 +205,7 @@ class _RoomInfoBody extends StatelessWidget {
               final from = Uri.encodeComponent(
                 '/room/$serverAlias/$roomId/info',
               );
-              context.go(
-                '/room/$serverAlias/$roomId/quiz/$quizId?from=$from',
-              );
+              context.go('/room/$serverAlias/$roomId/quiz/$quizId?from=$from');
             },
           ),
           ExpandableListCard<MapEntry<String, RoomSkill>>(
@@ -316,27 +310,27 @@ class _AgentCard extends StatelessWidget {
                 SystemPromptViewer(prompt: systemPrompt),
             ],
           FactoryRoomAgent(:final extraConfig) when extraConfig.isNotEmpty => [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Extra Config',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Extra Config',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
-                    const SizedBox(height: 4),
-                    formatDynamicValue(
-                      extraConfig,
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 4),
+                  formatDynamicValue(
+                    extraConfig,
+                    style: Theme.of(context).textTheme.bodySmall,
+                    context: context,
+                  ),
+                ],
               ),
-            ],
+            ),
+          ],
           _ => <Widget>[],
         },
         if (agent.aguiFeatureNames.isNotEmpty)
@@ -399,13 +393,13 @@ class _UploadedFilesCardState extends State<_UploadedFilesCard> {
       );
       final (filename, message) = switch (e) {
         PickFileReadException(:final filename) => (
-            filename,
-            'Failed to read file',
-          ),
+          filename,
+          'Failed to read file',
+        ),
         PickFilePickerException(:final filename) => (
-            filename ?? '(unknown)',
-            'Could not open file picker',
-          ),
+          filename ?? '(unknown)',
+          'Could not open file picker',
+        ),
       };
       _tracker.recordClientError(
         roomId: widget.roomId,
@@ -437,7 +431,7 @@ class _UploadedFilesCardState extends State<_UploadedFilesCard> {
       title: title,
       children: [
         _buildBody(status, theme),
-        const SizedBox(height: 8),
+        SizedBox(height: SoliplexSpacing.s2),
         Align(
           alignment: Alignment.centerLeft,
           child: FilledButton.icon(
@@ -452,43 +446,40 @@ class _UploadedFilesCardState extends State<_UploadedFilesCard> {
 
   Widget _buildBody(UploadsStatus status, ThemeData theme) {
     return switch (status) {
-      UploadsLoading() => const Padding(
-          padding: EdgeInsets.symmetric(vertical: 8),
-          child: SizedBox(
-            width: 16,
-            height: 16,
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
+      UploadsLoading() => Padding(
+        padding: EdgeInsets.symmetric(vertical: SoliplexSpacing.s2),
+        child: SizedBox(
+          width: 16,
+          height: 16,
+          child: CircularProgressIndicator(strokeWidth: 2),
         ),
+      ),
       UploadsLoaded(uploads: final list) when list.isEmpty =>
         const EmptyMessage(label: 'uploaded files'),
       UploadsLoaded(uploads: final list) => Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 8),
-            for (final entry in list)
-              _UploadEntryRow(entry: entry, onDismiss: _tracker.dismissFailed),
-          ],
-        ),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(height: SoliplexSpacing.s2),
+          for (final entry in list)
+            _UploadEntryRow(entry: entry, onDismiss: _tracker.dismissFailed),
+        ],
+      ),
       UploadsFailed(error: final error) => Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Text(
-            'Failed to load uploaded files: ${uploadErrorMessage(error)}',
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.error,
-            ),
+        padding: EdgeInsets.symmetric(vertical: SoliplexSpacing.s2),
+        child: Text(
+          'Failed to load uploaded files: ${uploadErrorMessage(error)}',
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.error,
           ),
         ),
+      ),
     };
   }
 }
 
 class _UploadEntryRow extends StatelessWidget {
-  const _UploadEntryRow({
-    required this.entry,
-    required this.onDismiss,
-  });
+  const _UploadEntryRow({required this.entry, required this.onDismiss});
 
   final DisplayUpload entry;
   final void Function(String entryId) onDismiss;
@@ -499,24 +490,24 @@ class _UploadEntryRow extends StatelessWidget {
     final isFailed = entry is FailedUpload;
     final (icon, color, errorMessage, dismissId) = switch (entry) {
       PersistedUpload() => (
-          Icons.check_circle_outline,
-          theme.colorScheme.primary,
-          null,
-          null,
-        ),
+        Icons.check_circle_outline,
+        theme.colorScheme.primary,
+        null,
+        null,
+      ),
       PendingUpload() => (null, theme.colorScheme.primary, null, null),
       FailedUpload(id: final id, message: final m) => (
-          Icons.error_outline,
-          theme.colorScheme.onErrorContainer,
-          m,
-          id,
-        ),
+        Icons.error_outline,
+        theme.colorScheme.onErrorContainer,
+        m,
+        id,
+      ),
     };
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 2),
       padding: isFailed
-          ? const EdgeInsets.symmetric(horizontal: 8, vertical: 4)
+          ? EdgeInsets.symmetric(horizontal: SoliplexSpacing.s2, vertical: 4)
           : null,
       decoration: isFailed
           ? BoxDecoration(
@@ -534,7 +525,7 @@ class _UploadEntryRow extends StatelessWidget {
               height: 16,
               child: CircularProgressIndicator(strokeWidth: 2),
             ),
-          const SizedBox(width: 8),
+          SizedBox(width: SoliplexSpacing.s2),
           Expanded(
             child: Text(
               entry.filename,
@@ -562,7 +553,7 @@ class _UploadEntryRow extends StatelessWidget {
               color: theme.colorScheme.onErrorContainer,
               onPressed: () => onDismiss(dismissId),
               padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
+              constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
               visualDensity: VisualDensity.compact,
             ),
         ],

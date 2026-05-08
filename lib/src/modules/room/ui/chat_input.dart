@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 import 'package:soliplex_agent/soliplex_agent.dart' hide State;
 
+import '../../../design/tokens/radii.dart';
+import '../../../design/tokens/spacing.dart';
 import '../../../shared/file_type_icons.dart';
 
 class ChatInput extends StatefulWidget {
@@ -111,7 +113,7 @@ class _ChatInputState extends State<ChatInput> {
     final disabled = !widget.enabled || active;
 
     return Padding(
-      padding: const EdgeInsets.all(8),
+      padding: EdgeInsets.all(SoliplexSpacing.s2),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,10 +121,10 @@ class _ChatInputState extends State<ChatInput> {
           if (widget.selectedDocuments.isNotEmpty)
             Container(
               margin: const EdgeInsets.only(bottom: 4),
-              padding: const EdgeInsets.all(8),
+              padding: EdgeInsets.all(SoliplexSpacing.s2),
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.surfaceContainerLow,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(soliplexRadii.sm),
               ),
               width: double.infinity,
               child: _chipsExpanded
@@ -138,12 +140,11 @@ class _ChatInputState extends State<ChatInput> {
                               const Spacer(),
                               Text(
                                 'Hide',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall
+                                style: Theme.of(context).textTheme.bodySmall
                                     ?.copyWith(
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.primary,
                                     ),
                               ),
                               Icon(
@@ -164,9 +165,7 @@ class _ChatInputState extends State<ChatInput> {
                                 for (final doc in widget.selectedDocuments)
                                   Chip(
                                     avatar: Icon(
-                                      getFileTypeIcon(
-                                        documentIconPath(doc),
-                                      ),
+                                      getFileTypeIcon(documentIconPath(doc)),
                                       size: 16,
                                     ),
                                     label: Text(documentDisplayName(doc)),
@@ -176,11 +175,9 @@ class _ChatInputState extends State<ChatInput> {
                                     ),
                                     onDeleted:
                                         widget.onDocumentRemoved == null ||
-                                                disabled
-                                            ? null
-                                            : () => widget.onDocumentRemoved!(
-                                                  doc,
-                                                ),
+                                            disabled
+                                        ? null
+                                        : () => widget.onDocumentRemoved!(doc),
                                     materialTapTargetSize:
                                         MaterialTapTargetSize.shrinkWrap,
                                     visualDensity: VisualDensity.compact,
@@ -198,9 +195,7 @@ class _ChatInputState extends State<ChatInput> {
                         children: [
                           Text(
                             '${widget.selectedDocuments.length} documents selected',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall
+                            style: Theme.of(context).textTheme.bodySmall
                                 ?.copyWith(
                                   color: Theme.of(context).colorScheme.primary,
                                 ),
@@ -252,7 +247,7 @@ class _ChatInputState extends State<ChatInput> {
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: SoliplexSpacing.s2),
               if (active)
                 IconButton(
                   icon: const Icon(Icons.stop),
@@ -263,8 +258,9 @@ class _ChatInputState extends State<ChatInput> {
                   valueListenable: _controller,
                   builder: (context, value, _) => IconButton(
                     icon: const Icon(Icons.send),
-                    onPressed:
-                        value.text.trim().isEmpty || disabled ? null : _send,
+                    onPressed: value.text.trim().isEmpty || disabled
+                        ? null
+                        : _send,
                   ),
                 ),
             ],

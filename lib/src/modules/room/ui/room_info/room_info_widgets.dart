@@ -2,6 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 
+import '../../../../design/tokens/spacing.dart';
+import '../../../../design/tokens/typography_x.dart';
+
 class SectionCard extends StatelessWidget {
   const SectionCard({super.key, required this.title, required this.children});
 
@@ -11,22 +14,22 @@ class SectionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.only(bottom: SoliplexSpacing.s3),
       child: Card(
         clipBehavior: Clip.antiAlias,
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(SoliplexSpacing.s4),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 title,
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.5,
-                    ),
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.5,
+                ),
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: SoliplexSpacing.s2),
               ...children,
             ],
           ),
@@ -55,17 +58,13 @@ class InfoRow extends StatelessWidget {
               label,
               style: theme.textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w600,
-                color:
-                    theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                color: theme.colorScheme.onSurfaceVariant.withValues(
+                  alpha: 0.7,
+                ),
               ),
             ),
           ),
-          Expanded(
-            child: Text(
-              value,
-              style: theme.textTheme.bodyMedium,
-            ),
-          ),
+          Expanded(child: Text(value, style: theme.textTheme.bodyMedium)),
         ],
       ),
     );
@@ -89,11 +88,7 @@ class EmptyMessage extends StatelessWidget {
 }
 
 class DialogButton extends StatelessWidget {
-  const DialogButton({
-    super.key,
-    required this.label,
-    required this.onPressed,
-  });
+  const DialogButton({super.key, required this.label, required this.onPressed});
   final String label;
   final VoidCallback onPressed;
 
@@ -105,7 +100,10 @@ class DialogButton extends StatelessWidget {
       child: TextButton(
         style: TextButton.styleFrom(
           textStyle: theme.textTheme.labelSmall,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: EdgeInsets.symmetric(
+            horizontal: SoliplexSpacing.s4,
+            vertical: SoliplexSpacing.s2,
+          ),
         ),
         onPressed: onPressed,
         child: Text(label),
@@ -118,7 +116,11 @@ const jsonPrettyEncoder = JsonEncoder.withIndent('  ');
 
 /// Formats a dynamic value for display, using pretty-printed JSON for
 /// complex values (maps/lists) and plain text for scalars.
-SelectableText formatDynamicValue(Object? value, {TextStyle? style}) {
+SelectableText formatDynamicValue(
+  Object? value, {
+  TextStyle? style,
+  required BuildContext context,
+}) {
   final isComplex = value is Map || value is Iterable;
   String text;
   if (isComplex) {
@@ -132,6 +134,6 @@ SelectableText formatDynamicValue(Object? value, {TextStyle? style}) {
   }
   return SelectableText(
     text,
-    style: isComplex ? style?.copyWith(fontFamily: 'monospace') : style,
+    style: isComplex ? context.monospace.copyWith(fontSize: 13) : style,
   );
 }

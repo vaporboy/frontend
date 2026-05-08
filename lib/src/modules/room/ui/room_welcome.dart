@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:soliplex_agent/soliplex_agent.dart';
 
+import '../../../design/tokens/radii.dart';
+import '../../../design/tokens/spacing.dart';
 import 'markdown/flutter_markdown_plus_renderer.dart';
 
 class RoomWelcome extends StatelessWidget {
@@ -32,7 +34,7 @@ class RoomWelcome extends StatelessWidget {
 
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: EdgeInsets.all(SoliplexSpacing.s8),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -45,7 +47,7 @@ class RoomWelcome extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
             if (currentRoom.hasWelcomeMessage) ...[
-              const SizedBox(height: 8),
+              SizedBox(height: SoliplexSpacing.s2),
               ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 480),
                 child: FlutterMarkdownPlusRenderer(
@@ -54,12 +56,12 @@ class RoomWelcome extends StatelessWidget {
               ),
             ],
             if (currentRoom.hasSuggestions) ...[
-              const SizedBox(height: 24),
+              SizedBox(height: SoliplexSpacing.s6),
               ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 520),
                 child: Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
+                  spacing: SoliplexSpacing.s2,
+                  runSpacing: SoliplexSpacing.s2,
                   alignment: WrapAlignment.center,
                   children: [
                     for (final suggestion in currentRoom.suggestions)
@@ -74,7 +76,7 @@ class RoomWelcome extends StatelessWidget {
               ),
             ],
             if (currentRoom.hasQuizzes) ...[
-              const SizedBox(height: 24),
+              SizedBox(height: SoliplexSpacing.s6),
               ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 520),
                 child: Column(
@@ -82,9 +84,12 @@ class RoomWelcome extends StatelessWidget {
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.quiz,
-                            size: 20, color: theme.colorScheme.primary),
-                        const SizedBox(width: 8),
+                        Icon(
+                          Icons.quiz,
+                          size: 20,
+                          color: theme.colorScheme.primary,
+                        ),
+                        SizedBox(width: SoliplexSpacing.s2),
                         Text(
                           currentRoom.quizzes.length == 1
                               ? 'Quiz Available'
@@ -93,10 +98,10 @@ class RoomWelcome extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: SoliplexSpacing.s2),
                     Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
+                      spacing: SoliplexSpacing.s2,
+                      runSpacing: SoliplexSpacing.s2,
                       alignment: WrapAlignment.center,
                       children: [
                         for (final entry in currentRoom.quizzes.entries)
@@ -134,12 +139,15 @@ class _SuggestionChip extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(soliplexRadii.sm),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: EdgeInsets.symmetric(
+              horizontal: SoliplexSpacing.s3,
+              vertical: 6,
+            ),
             decoration: BoxDecoration(
               border: Border.all(color: theme.colorScheme.outlineVariant),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(soliplexRadii.sm),
             ),
             child: Text(label, style: theme.textTheme.bodyMedium),
           ),

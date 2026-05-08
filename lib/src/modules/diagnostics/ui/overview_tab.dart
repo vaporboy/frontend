@@ -2,6 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 
+import '../../../design/tokens/radii.dart';
+import '../../../design/tokens/spacing.dart';
+import '../../../design/tokens/typography_x.dart';
 import '../models/event_accumulator.dart';
 import '../models/http_event_group.dart';
 import '../models/json_tree_model.dart';
@@ -51,11 +54,11 @@ class _OverviewTabState extends State<OverviewTab> {
     }
 
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(SoliplexSpacing.s4),
       children: [
         if (hasRequestBody) ...[
           _JsonSection(title: 'Request Body', body: body),
-          const SizedBox(height: 16),
+          const SizedBox(height: SoliplexSpacing.s4),
         ],
         if (group.isStream)
           _StreamSection(
@@ -116,20 +119,15 @@ class _StreamSection extends StatelessWidget {
                   value: _StreamView.conversation,
                   label: Text('Conversation'),
                 ),
-                ButtonSegment(
-                  value: _StreamView.events,
-                  label: Text('Events'),
-                ),
+                ButtonSegment(value: _StreamView.events, label: Text('Events')),
               ],
               selected: {view},
               onSelectionChanged: (s) => onViewChanged(s.first),
-              style: const ButtonStyle(
-                visualDensity: VisualDensity.compact,
-              ),
+              style: const ButtonStyle(visualDensity: VisualDensity.compact),
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: SoliplexSpacing.s2),
         if (parseResult.wasTruncated) _TruncationBanner(),
         if (view == _StreamView.conversation)
           _ConversationView(run: accumulatedRun)
@@ -146,11 +144,14 @@ class _TruncationBanner extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      margin: const EdgeInsets.only(bottom: SoliplexSpacing.s2),
+      padding: const EdgeInsets.symmetric(
+        horizontal: SoliplexSpacing.s3,
+        vertical: SoliplexSpacing.s2,
+      ),
       decoration: BoxDecoration(
         color: colorScheme.tertiaryContainer,
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(soliplexRadii.xs),
       ),
       child: Row(
         children: [
@@ -159,10 +160,10 @@ class _TruncationBanner extends StatelessWidget {
             size: 16,
             color: colorScheme.onTertiaryContainer,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: SoliplexSpacing.s2),
           Text(
             'Earlier stream content was truncated',
-            style: TextStyle(
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
               fontSize: 12,
               color: colorScheme.onTertiaryContainer,
             ),
@@ -186,9 +187,7 @@ class _ConversationView extends StatelessWidget {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        for (final entry in run.entries) _RunEntryCard(entry: entry),
-      ],
+      children: [for (final entry in run.entries) _RunEntryCard(entry: entry)],
     );
   }
 
@@ -197,8 +196,8 @@ class _ConversationView extends StatelessWidget {
       child: Text(
         message,
         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+        ),
       ),
     );
   }
@@ -216,62 +215,62 @@ class _RunEntryCard extends StatelessWidget {
 
     final (label, badgeColor, badgeTextColor, content) = switch (entry) {
       MessageEntry(:final role, :final text) => (
-          role.toUpperCase(),
-          role == 'user'
-              ? colorScheme.primaryContainer
-              : colorScheme.secondaryContainer,
-          role == 'user'
-              ? colorScheme.onPrimaryContainer
-              : colorScheme.onSecondaryContainer,
-          text,
-        ),
+        role.toUpperCase(),
+        role == 'user'
+            ? colorScheme.primaryContainer
+            : colorScheme.secondaryContainer,
+        role == 'user'
+            ? colorScheme.onPrimaryContainer
+            : colorScheme.onSecondaryContainer,
+        text,
+      ),
       ToolCallEntry(:final toolName, :final args) => (
-          'TOOL CALL',
-          colorScheme.tertiaryContainer,
-          colorScheme.onTertiaryContainer,
-          '$toolName\n$args',
-        ),
+        'TOOL CALL',
+        colorScheme.tertiaryContainer,
+        colorScheme.onTertiaryContainer,
+        '$toolName\n$args',
+      ),
       ToolResultEntry(:final content) => (
-          'TOOL RESULT',
-          colorScheme.surfaceContainerHighest,
-          colorScheme.onSurface,
-          content,
-        ),
+        'TOOL RESULT',
+        colorScheme.surfaceContainerHighest,
+        colorScheme.onSurface,
+        content,
+      ),
       ThinkingEntry(:final text) => (
-          'THINKING',
-          colorScheme.surfaceContainerLow,
-          colorScheme.onSurfaceVariant,
-          text,
-        ),
+        'THINKING',
+        colorScheme.surfaceContainerLow,
+        colorScheme.onSurfaceVariant,
+        text,
+      ),
       RunStatusEntry(:final type, :final message) => (
-          type,
-          colorScheme.surfaceContainerLow,
-          colorScheme.onSurfaceVariant,
-          message ?? '',
-        ),
+        type,
+        colorScheme.surfaceContainerLow,
+        colorScheme.onSurfaceVariant,
+        message ?? '',
+      ),
       StateEntry(:final type, :final data) => (
-          type,
-          colorScheme.surfaceContainerLow,
-          colorScheme.onSurfaceVariant,
-          data?.toString() ?? '',
-        ),
+        type,
+        colorScheme.surfaceContainerLow,
+        colorScheme.onSurfaceVariant,
+        data?.toString() ?? '',
+      ),
     };
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: SoliplexSpacing.s2),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(SoliplexSpacing.s3),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _RoleBadge(
-                label: label, color: badgeColor, textColor: badgeTextColor),
+              label: label,
+              color: badgeColor,
+              textColor: badgeTextColor,
+            ),
             if (content.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              SelectableText(
-                content,
-                style: theme.textTheme.bodySmall,
-              ),
+              const SizedBox(height: SoliplexSpacing.s2),
+              SelectableText(content, style: theme.textTheme.bodySmall),
             ],
           ],
         ),
@@ -294,14 +293,17 @@ class _RoleBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      padding: const EdgeInsets.symmetric(
+        horizontal: SoliplexSpacing.s2,
+        vertical: 2,
+      ),
       decoration: BoxDecoration(
         color: color,
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(soliplexRadii.xs),
       ),
       child: Text(
         label,
-        style: TextStyle(
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
           fontSize: 10,
           fontWeight: FontWeight.bold,
           color: textColor,
@@ -323,17 +325,15 @@ class _EventsView extends StatelessWidget {
         child: Text(
           'No events',
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
         ),
       );
     }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        for (final event in events) _SseEventCard(event: event),
-      ],
+      children: [for (final event in events) _SseEventCard(event: event)],
     );
   }
 }
@@ -365,18 +365,21 @@ class _SseEventCardState extends State<_SseEventCard> {
           InkWell(
             onTap: () => setState(() => _expanded = !_expanded),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: const EdgeInsets.symmetric(
+                horizontal: SoliplexSpacing.s3,
+                vertical: SoliplexSpacing.s2,
+              ),
               child: Row(
                 children: [
                   _EventTypeBadge(type: widget.event.type),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: SoliplexSpacing.s2),
                   if (summary.isNotEmpty)
                     Expanded(
                       child: Text(
                         summary,
-                        style: theme.textTheme.bodySmall?.copyWith(
+                        style: context.monospace.copyWith(
+                          fontSize: 13,
                           color: colorScheme.onSurfaceVariant,
-                          fontFamily: 'monospace',
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -393,7 +396,12 @@ class _SseEventCardState extends State<_SseEventCard> {
           ),
           if (_expanded)
             Padding(
-              padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+              padding: const EdgeInsets.fromLTRB(
+                SoliplexSpacing.s3,
+                0,
+                SoliplexSpacing.s3,
+                SoliplexSpacing.s3,
+              ),
               child: JsonTreeView(nodes: nodes),
             ),
         ],
@@ -414,13 +422,12 @@ class _EventTypeBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(soliplexRadii.xs),
       ),
       child: Text(
         type,
-        style: TextStyle(
+        style: context.monospace.copyWith(
           fontSize: 10,
-          fontFamily: 'monospace',
           color: colorScheme.onSurfaceVariant,
         ),
       ),
@@ -456,20 +463,18 @@ class _JsonSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(title, style: theme.textTheme.titleSmall),
-        const SizedBox(height: 8),
+        const SizedBox(height: SoliplexSpacing.s2),
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(SoliplexSpacing.s3),
           decoration: BoxDecoration(
             color: theme.colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(soliplexRadii.xs),
           ),
           child: plainText != null
               ? SelectableText(
                   plainText,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    fontFamily: 'monospace',
-                  ),
+                  style: context.monospace.copyWith(fontSize: 13),
                 )
               : JsonTreeView(nodes: buildJsonTree(parsed)),
         ),

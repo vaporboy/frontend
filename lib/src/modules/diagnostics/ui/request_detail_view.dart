@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:soliplex_agent/soliplex_agent.dart' hide State;
 
+import '../../../design/tokens/radii.dart';
+import '../../../design/tokens/spacing.dart';
+import '../../../design/tokens/typography_x.dart';
 import '../../../shared/copy_button.dart';
 import '../models/format_utils.dart';
 import '../models/http_event_group.dart';
@@ -92,11 +95,11 @@ class _RequestDetailViewState extends State<RequestDetailView>
   }
 
   List<int> get _matchCountsPerTab => [
-        _matchesForScope(SearchScope.request),
-        _matchesForScope(SearchScope.response),
-        _matchesForScope(SearchScope.curl),
-        _matchesForScope(SearchScope.overview),
-      ];
+    _matchesForScope(SearchScope.request),
+    _matchesForScope(SearchScope.response),
+    _matchesForScope(SearchScope.curl),
+    _matchesForScope(SearchScope.overview),
+  ];
 
   int get _totalMatches {
     final q = _searchController.text;
@@ -157,12 +160,13 @@ class _RequestDetailViewState extends State<RequestDetailView>
   Widget _buildSearchBar(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(
+        horizontal: SoliplexSpacing.s3,
+        vertical: 6,
+      ),
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLow,
-        border: Border(
-          bottom: BorderSide(color: colorScheme.outlineVariant),
-        ),
+        border: Border(bottom: BorderSide(color: colorScheme.outlineVariant)),
       ),
       child: Row(
         children: [
@@ -180,14 +184,16 @@ class _RequestDetailViewState extends State<RequestDetailView>
                       )
                     : null,
                 isDense: true,
-                contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: SoliplexSpacing.s2,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(6),
                 ),
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: SoliplexSpacing.s2),
           DropdownButton<SearchScope>(
             value: _scope,
             underline: const SizedBox.shrink(),
@@ -202,14 +208,11 @@ class _RequestDetailViewState extends State<RequestDetailView>
             },
             items: [
               for (final scope in SearchScope.values)
-                DropdownMenuItem(
-                  value: scope,
-                  child: Text(scope.label),
-                ),
+                DropdownMenuItem(value: scope, child: Text(scope.label)),
             ],
           ),
           if (_searchController.text.isNotEmpty && _totalMatches > 0) ...[
-            const SizedBox(width: 8),
+            const SizedBox(width: SoliplexSpacing.s2),
             Text(
               '${_currentMatchIndex + 1}/$_totalMatches',
               style: Theme.of(context).textTheme.bodySmall,
@@ -220,7 +223,7 @@ class _RequestDetailViewState extends State<RequestDetailView>
               tooltip: 'Previous match',
               visualDensity: VisualDensity.compact,
               padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+              constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
             ),
             IconButton(
               icon: const Icon(Icons.keyboard_arrow_down, size: 20),
@@ -228,7 +231,7 @@ class _RequestDetailViewState extends State<RequestDetailView>
               tooltip: 'Next match',
               visualDensity: VisualDensity.compact,
               padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+              constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
             ),
           ],
         ],
@@ -241,23 +244,18 @@ class _RequestDetailViewState extends State<RequestDetailView>
     final colorScheme = theme.colorScheme;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(SoliplexSpacing.s4),
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLow,
-        border: Border(
-          bottom: BorderSide(color: colorScheme.outlineVariant),
-        ),
+        border: Border(bottom: BorderSide(color: colorScheme.outlineVariant)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              _MethodBadge(
-                method: group.methodLabel,
-                isStream: group.isStream,
-              ),
-              const SizedBox(width: 8),
+              _MethodBadge(method: group.methodLabel, isStream: group.isStream),
+              const SizedBox(width: SoliplexSpacing.s2),
               Expanded(child: HttpStatusDisplay(group: group)),
               Text(
                 group.timestamp.toHttpTimeString(),
@@ -267,13 +265,8 @@ class _RequestDetailViewState extends State<RequestDetailView>
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          SelectableText(
-            group.uri.toString(),
-            style: theme.textTheme.bodyMedium?.copyWith(
-              fontFamily: 'monospace',
-            ),
-          ),
+          const SizedBox(height: SoliplexSpacing.s2),
+          SelectableText(group.uri.toString(), style: context.monospace),
         ],
       ),
     );
@@ -322,11 +315,11 @@ class _MatchBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
       decoration: BoxDecoration(
         color: colorScheme.primaryContainer,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(soliplexRadii.sm),
       ),
       child: Text(
         '$count',
-        style: TextStyle(
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
           fontSize: 10,
           fontWeight: FontWeight.bold,
           color: colorScheme.onPrimaryContainer,
@@ -353,14 +346,17 @@ class _MethodBadge extends StatelessWidget {
         : colorScheme.onPrimaryContainer;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(
+        horizontal: SoliplexSpacing.s2,
+        vertical: 4,
+      ),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(soliplexRadii.xs),
       ),
       child: Text(
         method,
-        style: TextStyle(
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
           fontWeight: FontWeight.bold,
           fontSize: 12,
           color: textColor,
@@ -385,20 +381,21 @@ class _RequestTab extends StatelessWidget {
     }
 
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(SoliplexSpacing.s4),
       children: [
         if (headers.isNotEmpty) ...[
           _SectionHeader(
             title: 'Headers',
             copyButton: CopyButton(
               iconSize: 18,
-              text:
-                  headers.entries.map((e) => '${e.key}: ${e.value}').join('\n'),
+              text: headers.entries
+                  .map((e) => '${e.key}: ${e.value}')
+                  .join('\n'),
               tooltip: 'Copy Headers',
             ),
           ),
           _HeadersTable(headers: headers),
-          const SizedBox(height: 16),
+          const SizedBox(height: SoliplexSpacing.s4),
         ],
         if (body != null) ...[
           _SectionHeader(
@@ -450,13 +447,14 @@ class _ResponseTab extends StatelessWidget {
     if (streamEnd.error != null) {
       return _ErrorDisplay(
         message: streamEnd.error!.message,
-        details: 'Duration: ${streamEnd.duration.toHttpDurationString()}\n'
+        details:
+            'Duration: ${streamEnd.duration.toHttpDurationString()}\n'
             'Bytes received: ${streamEnd.bytesReceived.toHttpBytesString()}',
       );
     }
 
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(SoliplexSpacing.s4),
       children: [
         _MetadataRow(
           label: 'Duration',
@@ -467,7 +465,7 @@ class _ResponseTab extends StatelessWidget {
           value: streamEnd.bytesReceived.toHttpBytesString(),
         ),
         if (streamEnd.body != null) ...[
-          const SizedBox(height: 16),
+          const SizedBox(height: SoliplexSpacing.s4),
           _SectionHeader(
             title: 'Stream Content',
             copyButton: CopyButton(
@@ -485,14 +483,15 @@ class _ResponseTab extends StatelessWidget {
   Widget _buildErrorResponse(HttpErrorEvent error) {
     return _ErrorDisplay(
       message: error.exception.message,
-      details: 'Type: ${error.exception.runtimeType}\n'
+      details:
+          'Type: ${error.exception.runtimeType}\n'
           'Duration: ${error.duration.toHttpDurationString()}',
     );
   }
 
   Widget _buildNormalResponse(HttpResponseEvent resp) {
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(SoliplexSpacing.s4),
       children: [
         _MetadataRow(label: 'Status', value: '${resp.statusCode}'),
         if (resp.reasonPhrase != null)
@@ -501,12 +500,9 @@ class _ResponseTab extends StatelessWidget {
           label: 'Duration',
           value: resp.duration.toHttpDurationString(),
         ),
-        _MetadataRow(
-          label: 'Size',
-          value: resp.bodySize.toHttpBytesString(),
-        ),
+        _MetadataRow(label: 'Size', value: resp.bodySize.toHttpBytesString()),
         if (resp.headers != null && resp.headers!.isNotEmpty) ...[
-          const SizedBox(height: 16),
+          const SizedBox(height: SoliplexSpacing.s4),
           _SectionHeader(
             title: 'Headers',
             copyButton: CopyButton(
@@ -520,7 +516,7 @@ class _ResponseTab extends StatelessWidget {
           _HeadersTable(headers: resp.headers!),
         ],
         if (resp.body != null) ...[
-          const SizedBox(height: 16),
+          const SizedBox(height: SoliplexSpacing.s4),
           _SectionHeader(
             title: 'Body',
             copyButton: CopyButton(
@@ -553,35 +549,33 @@ class _CurlTab extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(SoliplexSpacing.s4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Text(
-                'curl command',
-                style: theme.textTheme.titleSmall,
-              ),
+              Text('curl command', style: theme.textTheme.titleSmall),
               const Spacer(),
               CopyButton(
-                  iconSize: 18, text: curl, tooltip: 'Copy to clipboard'),
+                iconSize: 18,
+                text: curl,
+                tooltip: 'Copy to clipboard',
+              ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: SoliplexSpacing.s2),
           Expanded(
             child: Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(SoliplexSpacing.s3),
               decoration: BoxDecoration(
                 color: theme.colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(soliplexRadii.sm),
               ),
               child: SelectableText(
                 curl,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  fontFamily: 'monospace',
-                ),
+                style: context.monospace.copyWith(fontSize: 13),
               ),
             ),
           ),
@@ -601,7 +595,7 @@ class _SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: SoliplexSpacing.s2),
       child: Row(
         children: [
           Text(title, style: theme.textTheme.titleSmall),
@@ -626,24 +620,22 @@ class _HeadersTable extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         border: Border.all(color: colorScheme.outlineVariant),
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(soliplexRadii.xs),
       ),
       child: Column(
         children: [
           for (final (index, entry) in headers.entries.indexed)
             Container(
               padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 8,
+                horizontal: SoliplexSpacing.s3,
+                vertical: SoliplexSpacing.s2,
               ),
               decoration: BoxDecoration(
                 color: index.isEven
                     ? colorScheme.surfaceContainerLow
                     : colorScheme.surface,
                 border: index > 0
-                    ? Border(
-                        top: BorderSide(color: colorScheme.outlineVariant),
-                      )
+                    ? Border(top: BorderSide(color: colorScheme.outlineVariant))
                     : null,
               ),
               child: Row(
@@ -653,19 +645,17 @@ class _HeadersTable extends StatelessWidget {
                     width: 140,
                     child: SelectableText(
                       entry.key,
-                      style: theme.textTheme.bodySmall?.copyWith(
+                      style: context.monospace.copyWith(
+                        fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        fontFamily: 'monospace',
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: SoliplexSpacing.s2),
                   Expanded(
                     child: SelectableText(
                       entry.value,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        fontFamily: 'monospace',
-                      ),
+                      style: context.monospace.copyWith(fontSize: 13),
                     ),
                   ),
                 ],
@@ -689,16 +679,14 @@ class _BodyDisplay extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(SoliplexSpacing.s3),
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(soliplexRadii.xs),
       ),
       child: SelectableText(
         formattedBody,
-        style: theme.textTheme.bodySmall?.copyWith(
-          fontFamily: 'monospace',
-        ),
+        style: context.monospace.copyWith(fontSize: 13),
       ),
     );
   }
@@ -727,10 +715,7 @@ class _MetadataRow extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: SelectableText(
-              value,
-              style: theme.textTheme.bodyMedium,
-            ),
+            child: SelectableText(value, style: theme.textTheme.bodyMedium),
           ),
         ],
       ),
@@ -769,12 +754,12 @@ class _ErrorDisplay extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(SoliplexSpacing.s4),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(Icons.error_outline, size: 48, color: colorScheme.error),
-          const SizedBox(height: 12),
+          const SizedBox(height: SoliplexSpacing.s3),
           Text(
             message,
             style: theme.textTheme.bodyLarge?.copyWith(
@@ -783,7 +768,7 @@ class _ErrorDisplay extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           if (details != null) ...[
-            const SizedBox(height: 8),
+            const SizedBox(height: SoliplexSpacing.s2),
             Text(
               details!,
               style: theme.textTheme.bodySmall?.copyWith(

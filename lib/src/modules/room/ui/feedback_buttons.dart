@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:soliplex_client/soliplex_client.dart' show FeedbackType;
 
+import '../../../design/tokens/radii.dart';
 import 'feedback_reason_dialog.dart';
 
 enum _FeedbackPhase { idle, countdown, modal, submitted }
@@ -79,14 +80,11 @@ class _FeedbackButtonsState extends State<FeedbackButtons>
       _direction = direction;
     });
     _controller.reverse(from: 1);
-    _countdownTimer = Timer(
-      Duration(seconds: widget.countdownSeconds),
-      () {
-        if (mounted && _phase == _FeedbackPhase.countdown) {
-          _submit(null);
-        }
-      },
-    );
+    _countdownTimer = Timer(Duration(seconds: widget.countdownSeconds), () {
+      if (mounted && _phase == _FeedbackPhase.countdown) {
+        _submit(null);
+      }
+    });
   }
 
   Future<void> _onTellUsWhyTap() async {
@@ -152,7 +150,7 @@ class _FeedbackButtonsState extends State<FeedbackButtons>
           const SizedBox(width: 4),
           InkWell(
             onTap: _onTellUsWhyTap,
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(soliplexRadii.xs),
             child: Text(
               'Tell us why!',
               style: theme.textTheme.labelSmall?.copyWith(
@@ -190,7 +188,7 @@ class _ThumbButton extends StatelessWidget {
         message: tooltip,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(soliplexRadii.xs),
           child: Icon(icon, size: 20, color: color),
         ),
       ),

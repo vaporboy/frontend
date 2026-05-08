@@ -1,6 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+
+import '../../../../design/tokens/radii.dart';
+import '../../../../design/tokens/spacing.dart';
+import '../../../../design/tokens/typography_x.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 import 'package:soliplex_agent/soliplex_agent.dart' hide State;
@@ -100,9 +104,12 @@ class _ExecutionTimelineState extends ConsumerState<ExecutionTimeline> {
     );
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: EdgeInsets.only(bottom: SoliplexSpacing.s2),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: EdgeInsets.symmetric(
+          horizontal: SoliplexSpacing.s3,
+          vertical: 6,
+        ),
         decoration: BoxDecoration(
           color: theme.colorScheme.surfaceContainerLow,
           borderRadius: BorderRadius.circular(6),
@@ -162,7 +169,7 @@ class _ExecutionTimelineState extends ConsumerState<ExecutionTimeline> {
       child: Row(
         children: [
           _stepIcon(step, theme),
-          const SizedBox(width: 8),
+          SizedBox(width: SoliplexSpacing.s2),
           Expanded(
             child: Text(
               step.label,
@@ -214,7 +221,7 @@ class _ExecutionTimelineState extends ConsumerState<ExecutionTimeline> {
                 ),
                 const SizedBox(width: 2),
                 _activityStatusIcon(activity.status, theme),
-                const SizedBox(width: 8),
+                SizedBox(width: SoliplexSpacing.s2),
                 Expanded(
                   child: Text(
                     activity.toolName,
@@ -242,12 +249,12 @@ class _ExecutionTimelineState extends ConsumerState<ExecutionTimeline> {
 
   Widget _sourceBlock(String source, ThemeData theme) {
     return Padding(
-      padding: const EdgeInsets.only(top: 4, bottom: 6, left: 24),
+      padding: EdgeInsets.only(top: 4, bottom: 6, left: SoliplexSpacing.s6),
       child: Container(
-        padding: const EdgeInsets.all(8),
+        padding: EdgeInsets.all(SoliplexSpacing.s2),
         decoration: BoxDecoration(
           color: theme.colorScheme.surfaceContainer,
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(soliplexRadii.xs),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -258,11 +265,7 @@ class _ExecutionTimelineState extends ConsumerState<ExecutionTimeline> {
             ),
             SelectableText(
               source,
-              style: theme.textTheme.bodySmall?.copyWith(
-                fontFamily: 'monospace',
-                fontSize: 12,
-                height: 1.3,
-              ),
+              style: context.monospace.copyWith(fontSize: 12, height: 1.3),
             ),
           ],
         ),

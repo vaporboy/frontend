@@ -6,6 +6,8 @@ import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:markdown/markdown.dart' as md;
 
+import '../../../../design/tokens/radii.dart';
+import '../../../../design/tokens/spacing.dart';
 import '../copy_button.dart';
 
 class CodeBlockBuilder extends MarkdownElementBuilder {
@@ -14,10 +16,7 @@ class CodeBlockBuilder extends MarkdownElementBuilder {
   final TextStyle preferredStyle;
 
   @override
-  Widget? visitElementAfter(
-    md.Element element,
-    TextStyle? preferredStyle,
-  ) {
+  Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
     final code = element.textContent;
     final language = _languageFrom(element);
 
@@ -28,8 +27,9 @@ class CodeBlockBuilder extends MarkdownElementBuilder {
       );
     }
 
-    final semanticLabel =
-        language == 'plaintext' ? 'Code block' : 'Code block in $language';
+    final semanticLabel = language == 'plaintext'
+        ? 'Code block'
+        : 'Code block in $language';
     return Semantics(
       label: semanticLabel,
       child: _CodeBlock(
@@ -77,7 +77,12 @@ class _SvgCodeBlockState extends State<_SvgCodeBlock> {
       children: [
         _toolbar(theme),
         Padding(
-          padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+          padding: EdgeInsets.fromLTRB(
+            SoliplexSpacing.s3,
+            0,
+            SoliplexSpacing.s3,
+            SoliplexSpacing.s3,
+          ),
           child: _showSource ? _sourceView() : _previewView(),
         ),
       ],
@@ -90,10 +95,10 @@ class _SvgCodeBlockState extends State<_SvgCodeBlock> {
       child: SvgPicture.string(
         widget.code,
         placeholderBuilder: (_) => const SizedBox.shrink(),
-        errorBuilder: (_, __, ___) => const Icon(
+        errorBuilder: (_, __, ___) => Icon(
           Icons.broken_image,
           size: 48,
-          color: Colors.grey,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
         ),
       ),
     );
@@ -117,7 +122,7 @@ class _SvgCodeBlockState extends State<_SvgCodeBlock> {
     return Row(
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 12, top: 4),
+          padding: EdgeInsets.only(left: SoliplexSpacing.s3, top: 4),
           child: Text('svg', style: labelStyle),
         ),
         const Spacer(),
@@ -126,7 +131,7 @@ class _SvgCodeBlockState extends State<_SvgCodeBlock> {
           child: Tooltip(
             message: _showSource ? 'Show preview' : 'Show source',
             child: InkWell(
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: BorderRadius.circular(soliplexRadii.xs),
               onTap: () => setState(() => _showSource = !_showSource),
               child: Padding(
                 padding: const EdgeInsets.all(4),
@@ -173,7 +178,7 @@ class _CodeBlock extends StatelessWidget {
           children: [
             if (language != 'plaintext')
               Padding(
-                padding: const EdgeInsets.only(left: 12, top: 4),
+                padding: EdgeInsets.only(left: SoliplexSpacing.s3, top: 4),
                 child: Text(
                   language,
                   style: theme.textTheme.labelSmall?.copyWith(
@@ -184,21 +189,23 @@ class _CodeBlock extends StatelessWidget {
             const Spacer(),
             Padding(
               padding: const EdgeInsets.only(right: 4, top: 4),
-              child: CopyButton(
-                text: code,
-                tooltip: 'Copy code',
-                iconSize: 16,
-              ),
+              child: CopyButton(text: code, tooltip: 'Copy code', iconSize: 16),
             ),
           ],
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+          padding: EdgeInsets.fromLTRB(
+            SoliplexSpacing.s3,
+            0,
+            SoliplexSpacing.s3,
+            SoliplexSpacing.s3,
+          ),
           child: HighlightView(
             code,
             language: language,
-            theme:
-                theme.brightness == Brightness.dark ? vs2015Theme : githubTheme,
+            theme: theme.brightness == Brightness.dark
+                ? vs2015Theme
+                : githubTheme,
             padding: EdgeInsets.zero,
             textStyle: codeStyle,
           ),

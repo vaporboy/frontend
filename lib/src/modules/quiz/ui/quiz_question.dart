@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:soliplex_client/soliplex_client.dart';
 
+import '../../../design/tokens/spacing.dart';
 import '../quiz_session.dart';
 import 'quiz_answer_input.dart';
 import 'quiz_feedback.dart';
@@ -51,7 +52,7 @@ class QuizQuestionView extends StatelessWidget {
         ),
         Expanded(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(SoliplexSpacing.s4),
             child: Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 600),
@@ -65,22 +66,22 @@ class QuizQuestionView extends StatelessWidget {
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: SoliplexSpacing.s2),
                     Text(question.text, style: theme.textTheme.titleLarge),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: SoliplexSpacing.s4),
                     _buildInput(question, questionState, selectedOption),
                     if (submissionError != null) ...[
-                      const SizedBox(height: 16),
+                      const SizedBox(height: SoliplexSpacing.s4),
                       QuizErrorFeedback(
                         message: submissionError!,
                         onRetry: onRetry,
                       ),
                     ],
                     if (questionState case Answered(:final result)) ...[
-                      const SizedBox(height: 16),
+                      const SizedBox(height: SoliplexSpacing.s4),
                       QuizAnswerFeedback(result: result),
                     ],
-                    const SizedBox(height: 16),
+                    const SizedBox(height: SoliplexSpacing.s4),
                     _buildActionButton(questionState),
                   ],
                 ),
@@ -99,44 +100,42 @@ class QuizQuestionView extends StatelessWidget {
   ) {
     return switch (question.type) {
       MultipleChoice(:final options) => QuizMultipleChoiceInput(
-          options: options,
-          selectedOption: selectedOption,
-          questionState: questionState,
-          onSelected: onSelectOption,
-        ),
+        options: options,
+        selectedOption: selectedOption,
+        questionState: questionState,
+        onSelected: onSelectOption,
+      ),
       FillBlank() || FreeForm() => QuizTextInput(
-          controller: answerController,
-          questionState: questionState,
-          onChanged: onTextChanged,
-          onSubmitted: onSubmit,
-        ),
+        controller: answerController,
+        questionState: questionState,
+        onChanged: onTextChanged,
+        onSubmitted: onSubmit,
+      ),
     };
   }
 
   Widget _buildActionButton(QuestionState questionState) {
     return switch (questionState) {
       AwaitingInput() => const FilledButton(
-          onPressed: null,
-          child: Text('Submit Answer'),
-        ),
+        onPressed: null,
+        child: Text('Submit Answer'),
+      ),
       Composing(:final canSubmit) => FilledButton(
-          onPressed: canSubmit ? onSubmit : null,
-          child: const Text('Submit Answer'),
-        ),
+        onPressed: canSubmit ? onSubmit : null,
+        child: const Text('Submit Answer'),
+      ),
       Submitting() => const FilledButton(
-          onPressed: null,
-          child: SizedBox(
-            width: 20,
-            height: 20,
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
+        onPressed: null,
+        child: SizedBox(
+          width: 20,
+          height: 20,
+          child: CircularProgressIndicator(strokeWidth: 2),
         ),
+      ),
       Answered() => FilledButton(
-          onPressed: onNext,
-          child: Text(
-            session.isLastQuestion ? 'See Results' : 'Next Question',
-          ),
-        ),
+        onPressed: onNext,
+        child: Text(session.isLastQuestion ? 'See Results' : 'Next Question'),
+      ),
     };
   }
 }

@@ -53,15 +53,12 @@ ThemeData _defaultTheme() {
         ),
         codeBlockDecoration: BoxDecoration(
           color: colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(soliplexRadii.sm),
         ),
         blockquoteDecoration: BoxDecoration(
           color: colorScheme.surfaceContainerHighest,
           border: Border(
-            left: BorderSide(
-              color: colorScheme.outlineVariant,
-              width: 3,
-            ),
+            left: BorderSide(color: colorScheme.outlineVariant, width: 3),
           ),
         ),
       ),
@@ -93,14 +90,13 @@ Future<ShellConfig> standard({
   SoliplexHttpClient buildClient({
     String? Function()? getToken,
     TokenRefresher? tokenRefresher,
-  }) =>
-      createAgentHttpClient(
-        innerClient: createPlatformClient(),
-        observers: [inspector],
-        getToken: getToken,
-        tokenRefresher: tokenRefresher,
-        onDiagnostic: onHttpDiagnostic,
-      );
+  }) => createAgentHttpClient(
+    innerClient: createPlatformClient(),
+    observers: [inspector],
+    getToken: getToken,
+    tokenRefresher: tokenRefresher,
+    onDiagnostic: onHttpDiagnostic,
+  );
 
   final plainClient = buildClient();
   final refreshService = TokenRefreshService(httpClient: plainClient);
@@ -118,7 +114,8 @@ Future<ShellConfig> standard({
   await serverManager.restoreServers();
 
   final savedUrl = await DefaultBackendUrlStorage.load();
-  final resolvedUrl = savedUrl ??
+  final resolvedUrl =
+      savedUrl ??
       platformDefaultBackendUrl(
         configUrl: defaultBackendUrl,
         isWeb: kIsWeb,

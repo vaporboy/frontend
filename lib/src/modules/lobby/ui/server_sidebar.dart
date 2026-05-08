@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../design/tokens/spacing.dart';
 import '../../auth/server_entry.dart';
 import '../lobby_state.dart';
 
@@ -60,12 +61,17 @@ class _ServerList extends StatelessWidget {
     return ListView(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          padding: const EdgeInsets.fromLTRB(
+            SoliplexSpacing.s4,
+            SoliplexSpacing.s4,
+            SoliplexSpacing.s4,
+            SoliplexSpacing.s2,
+          ),
           child: Text(
             'Servers (${servers.length})',
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
         ),
         for (final entry in servers.entries)
@@ -75,7 +81,7 @@ class _ServerList extends StatelessWidget {
             onTap: onServerTap,
           ),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
+          padding: const EdgeInsets.symmetric(horizontal: SoliplexSpacing.s2),
           child: OutlinedButton.icon(
             onPressed: onAddServer,
             icon: const Icon(Icons.add, size: 18),
@@ -133,10 +139,7 @@ class _ActionButtons extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        TextButton(
-          onPressed: onAddServer,
-          child: const Text('Home'),
-        ),
+        TextButton(onPressed: onAddServer, child: const Text('Home')),
         TextButton(
           onPressed: onNetworkInspector,
           child: const Text('Network Inspector'),

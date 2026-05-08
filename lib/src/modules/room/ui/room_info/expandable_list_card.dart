@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../../design/tokens/radii.dart';
+import '../../../../design/tokens/spacing.dart';
+import '../../../../design/tokens/typography_x.dart';
 import 'room_info_widgets.dart';
 
 class ExpandableTile extends StatelessWidget {
@@ -26,10 +29,7 @@ class ExpandableTile extends StatelessWidget {
         Expanded(
           child: Text(
             name,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              fontFamily: 'monospace',
-              fontWeight: FontWeight.w600,
-            ),
+            style: context.monospace.copyWith(fontWeight: FontWeight.w600),
           ),
         ),
         if (hasContent)
@@ -55,10 +55,10 @@ class ExpandableTile extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 4),
                 child: Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(8),
+                  padding: EdgeInsets.all(SoliplexSpacing.s2),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(soliplexRadii.sm),
                   ),
                   child: content,
                 ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:soliplex_client/soliplex_client.dart';
 
+import '../../../../design/tokens/spacing.dart';
 import 'room_info_widgets.dart';
 
 Widget buildSkillContent(RoomSkill skill) {
@@ -32,10 +33,7 @@ class SkillContentColumn extends StatelessWidget {
         children: [
           Text(label, style: labelStyle),
           const SizedBox(height: 2),
-          Text(
-            isNone ? 'None' : value,
-            style: isNone ? noneStyle : valueStyle,
-          ),
+          Text(isNone ? 'None' : value, style: isNone ? noneStyle : valueStyle),
         ],
       );
     }
@@ -44,15 +42,15 @@ class SkillContentColumn extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         field('description', skill.description),
-        const SizedBox(height: 8),
+        SizedBox(height: SoliplexSpacing.s2),
         field('source', skill.source),
-        const SizedBox(height: 8),
+        SizedBox(height: SoliplexSpacing.s2),
         field('license', skill.license),
-        const SizedBox(height: 8),
+        SizedBox(height: SoliplexSpacing.s2),
         field('compatibility', skill.compatibility),
-        const SizedBox(height: 8),
+        SizedBox(height: SoliplexSpacing.s2),
         field('allowed_tools', skill.allowedTools?.join(', ')),
-        const SizedBox(height: 8),
+        SizedBox(height: SoliplexSpacing.s2),
         field('state_namespace', skill.stateNamespace),
         if (skill.metadata.isNotEmpty ||
             (skill.stateTypeSchema?.isNotEmpty ?? false))
@@ -95,7 +93,7 @@ class SkillDetailDialog extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(title, style: sectionStyle),
-          const SizedBox(height: 8),
+          SizedBox(height: SoliplexSpacing.s2),
           if (isEmpty)
             Text('Empty', style: noneStyle)
           else
@@ -105,7 +103,7 @@ class SkillDetailDialog extends StatelessWidget {
                 child: Card(
                   margin: EdgeInsets.zero,
                   child: Padding(
-                    padding: const EdgeInsets.all(12),
+                    padding: EdgeInsets.all(SoliplexSpacing.s3),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -114,24 +112,21 @@ class SkillDetailDialog extends StatelessWidget {
                         formatDynamicValue(
                           entry.value,
                           style: valueStyle,
+                          context: context,
                         ),
                       ],
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: SoliplexSpacing.s2),
             ],
         ],
       );
     }
 
     return AlertDialog(
-      title: Text(
-        skill.name,
-        overflow: TextOverflow.ellipsis,
-        maxLines: 1,
-      ),
+      title: Text(skill.name, overflow: TextOverflow.ellipsis, maxLines: 1),
       content: SizedBox(
         width: double.maxFinite,
         child: SingleChildScrollView(
@@ -140,7 +135,7 @@ class SkillDetailDialog extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               mapSection('Metadata', skill.metadata),
-              const SizedBox(height: 16),
+              SizedBox(height: SoliplexSpacing.s4),
               mapSection('State Schema', skill.stateTypeSchema),
             ],
           ),

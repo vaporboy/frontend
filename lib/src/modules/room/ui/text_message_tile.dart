@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soliplex_agent/soliplex_agent.dart';
 
+import '../../../design/tokens/radii.dart';
+import '../../../design/tokens/spacing.dart';
 import '../execution_tracker.dart';
 import '../room_providers.dart';
 import 'citations_section.dart';
@@ -79,30 +81,28 @@ class TextMessageTile extends StatelessWidget {
             color: isUser
                 ? theme.colorScheme.primaryContainer
                 : theme.colorScheme.surfaceContainerLow,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(soliplexRadii.md),
           ),
           child: isUser
               ? SelectableText(
                   message.text,
-                  style: TextStyle(
-                    color: theme.colorScheme.onPrimaryContainer,
-                  ),
+                  style: TextStyle(color: theme.colorScheme.onPrimaryContainer),
                 )
               : message.text.isEmpty
-                  ? const Text('...')
-                  : FlutterMarkdownPlusRenderer(data: message.text),
+              ? const Text('...')
+              : FlutterMarkdownPlusRenderer(data: message.text),
         ),
         const SizedBox(height: 4),
         Row(
           children: [
             CopyButton(text: message.text),
             if (isUser && onInspect != null) ...[
-              const SizedBox(width: 8),
+              SizedBox(width: SoliplexSpacing.s2),
               Tooltip(
                 message: 'Inspect HTTP traffic',
                 child: InkWell(
                   onTap: onInspect,
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(soliplexRadii.xs),
                   child: Icon(
                     Icons.bug_report_outlined,
                     size: 20,
@@ -112,7 +112,7 @@ class TextMessageTile extends StatelessWidget {
               ),
             ],
             if (showFeedback) ...[
-              const SizedBox(width: 8),
+              SizedBox(width: SoliplexSpacing.s2),
               FeedbackButtons(onFeedbackSubmit: onFeedbackSubmit!),
             ],
           ],
@@ -141,8 +141,9 @@ class _ThinkingBlock extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final expansion =
-        ref.read(messageExpansionsProvider).forMessage(roomId, messageId);
+    final expansion = ref
+        .read(messageExpansionsProvider)
+        .forMessage(roomId, messageId);
     // ExpansionTile reads initiallyExpanded once on mount and does not
     // rebuild when the store changes. Safe because _ThinkingBlock and
     // ExecutionThinkingBlock are selected by hasTracker and are therefore
@@ -161,11 +162,7 @@ class _ThinkingBlock extends ConsumerWidget {
               ),
             ),
           ),
-          CopyButton(
-            text: text,
-            tooltip: 'Copy thinking',
-            iconSize: 16,
-          ),
+          CopyButton(text: text, tooltip: 'Copy thinking', iconSize: 16),
         ],
       ),
       dense: true,

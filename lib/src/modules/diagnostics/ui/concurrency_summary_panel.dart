@@ -3,6 +3,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:soliplex_agent/soliplex_agent.dart';
 
+import '../../../design/tokens/spacing.dart';
+
 /// Compact header strip showing aggregate queue health from the HTTP
 /// concurrency limiter.
 ///
@@ -25,7 +27,10 @@ class ConcurrencySummaryPanel extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(
+        horizontal: SoliplexSpacing.s3,
+        vertical: SoliplexSpacing.s2,
+      ),
       color: theme.colorScheme.surfaceContainerHighest,
       child: Row(
         children: [
@@ -34,10 +39,10 @@ class ConcurrencySummaryPanel extends StatelessWidget {
             size: 16,
             color: theme.colorScheme.onSurfaceVariant,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: SoliplexSpacing.s2),
           Expanded(
             child: Wrap(
-              spacing: 12,
+              spacing: SoliplexSpacing.s3,
               runSpacing: 4,
               children: [
                 Text(

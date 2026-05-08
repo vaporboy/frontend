@@ -3,6 +3,7 @@ import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:soliplex_client/soliplex_client.dart' hide State;
 
+import '../../../design/tokens/spacing.dart';
 import '../../../shared/file_type_icons.dart';
 
 class DocumentPicker extends StatefulWidget {
@@ -50,7 +51,12 @@ class _DocumentPickerState extends State<DocumentPicker> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          padding: EdgeInsets.fromLTRB(
+            SoliplexSpacing.s4,
+            SoliplexSpacing.s4,
+            SoliplexSpacing.s4,
+            SoliplexSpacing.s2,
+          ),
           child: TextField(
             controller: _searchController,
             decoration: InputDecoration(
@@ -80,7 +86,7 @@ class _DocumentPickerState extends State<DocumentPicker> {
         ),
         if (widget.selected.isNotEmpty)
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: EdgeInsets.symmetric(horizontal: SoliplexSpacing.s4),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -188,10 +194,10 @@ Future<Set<RagDocument>?> showDocumentPicker({
                   Text(
                     'Failed to load documents.',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.error,
-                        ),
+                      color: Theme.of(context).colorScheme.error,
+                    ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: SoliplexSpacing.s2),
                   TextButton.icon(
                     onPressed: () => setDialogState(() {
                       documentsFuture = fetchDocuments();
@@ -208,8 +214,8 @@ Future<Set<RagDocument>?> showDocumentPicker({
               child: Text(
                 'No documents in this room.',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
             );
           } else {
@@ -235,8 +241,9 @@ Future<Set<RagDocument>?> showDocumentPicker({
                 child: const Text('Cancel'),
               ),
               FilledButton(
-                onPressed:
-                    canConfirm ? () => Navigator.pop(context, current) : null,
+                onPressed: canConfirm
+                    ? () => Navigator.pop(context, current)
+                    : null,
                 child: const Text('Done'),
               ),
             ],

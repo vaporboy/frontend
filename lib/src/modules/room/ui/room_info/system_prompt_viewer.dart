@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../../design/tokens/radii.dart';
+import '../../../../design/tokens/spacing.dart';
+import '../../../../design/tokens/typography_x.dart';
 import '../../../../shared/copy_button.dart';
 
 class SystemPromptViewer extends StatefulWidget {
@@ -21,7 +24,7 @@ class _SystemPromptViewerState extends State<SystemPromptViewer> {
     final colorScheme = theme.colorScheme;
 
     return Padding(
-      padding: const EdgeInsets.only(top: 8),
+      padding: EdgeInsets.only(top: SoliplexSpacing.s2),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -43,23 +46,18 @@ class _SystemPromptViewerState extends State<SystemPromptViewer> {
           ),
           LayoutBuilder(
             builder: (context, constraints) {
-              final promptStyle = theme.textTheme.bodyMedium?.copyWith(
-                fontFamily: 'monospace',
-                fontSize: 14,
-              );
+              final promptStyle = context.monospace.copyWith(fontSize: 14);
               const containerPadding = 16.0;
-              final overflows = !_expanded &&
+              final overflows =
+                  !_expanded &&
                   (TextPainter(
-                    text: TextSpan(
-                      text: widget.prompt,
-                      style: promptStyle,
-                    ),
-                    maxLines: _collapsedMaxLines,
-                    textDirection: TextDirection.ltr,
-                    textScaler: MediaQuery.textScalerOf(context),
-                  )..layout(
-                          maxWidth: constraints.maxWidth - containerPadding,
-                        ))
+                        text: TextSpan(text: widget.prompt, style: promptStyle),
+                        maxLines: _collapsedMaxLines,
+                        textDirection: TextDirection.ltr,
+                        textScaler: MediaQuery.textScalerOf(context),
+                      )..layout(
+                        maxWidth: constraints.maxWidth - containerPadding,
+                      ))
                       .didExceedMaxLines;
 
               return Column(
@@ -67,10 +65,10 @@ class _SystemPromptViewerState extends State<SystemPromptViewer> {
                 children: [
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(8),
+                    padding: EdgeInsets.all(SoliplexSpacing.s2),
                     decoration: BoxDecoration(
                       color: colorScheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(soliplexRadii.sm),
                     ),
                     child: SelectableText(
                       widget.prompt,

@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 import 'package:soliplex_client/soliplex_client.dart'
     show RagDocument, Room, SourceReferenceFormatting, buildDocumentFilter;
+import '../../../design/tokens/radii.dart';
 import '../../auth/server_entry.dart';
 import '../document_selections.dart';
 import '../pick_file.dart';
@@ -32,6 +33,7 @@ import 'thread_sidebar.dart';
 import 'upload_event_banner.dart';
 import '../upload_tracker.dart';
 import '../upload_tracker_registry.dart';
+import '../../../design/tokens/spacing.dart';
 
 const double _sidebarWidth = 300;
 const double _wideBreakpoint = 600;
@@ -120,8 +122,9 @@ class _RoomScreenState extends State<RoomScreen> {
     final selected = _selectedDocuments;
     return {
       'rag': <String, dynamic>{
-        'document_filter':
-            selected.isEmpty ? null : buildDocumentFilter(selected.toList()),
+        'document_filter': selected.isEmpty
+            ? null
+            : buildDocumentFilter(selected.toList()),
       },
     };
   }
@@ -185,13 +188,13 @@ class _RoomScreenState extends State<RoomScreen> {
   }
 
   RoomState _createRoomState() => RoomState(
-        serverEntry: widget.serverEntry,
-        roomId: widget.roomId,
-        runtimeManager: widget.runtimeManager,
-        registry: widget.registry,
-        uploadRegistry: widget.uploadRegistry,
-        onNavigateToThread: (id) => _navigateToThread(id),
-      );
+    serverEntry: widget.serverEntry,
+    roomId: widget.roomId,
+    runtimeManager: widget.runtimeManager,
+    registry: widget.registry,
+    uploadRegistry: widget.uploadRegistry,
+    onNavigateToThread: (id) => _navigateToThread(id),
+  );
 
   void _navigateToThread(String? threadId, {bool replace = false}) {
     if (!mounted) return;
@@ -249,13 +252,13 @@ class _RoomScreenState extends State<RoomScreen> {
       );
       final (filename, message) = switch (e) {
         PickFileReadException(:final filename) => (
-            filename,
-            'Failed to read file',
-          ),
+          filename,
+          'Failed to read file',
+        ),
         PickFilePickerException(:final filename) => (
-            filename ?? '(unknown)',
-            'Could not open file picker',
-          ),
+          filename ?? '(unknown)',
+          'Could not open file picker',
+        ),
       };
       _state.uploadTracker.recordClientError(
         roomId: widget.roomId,
@@ -435,8 +438,9 @@ class _RoomScreenState extends State<RoomScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       _chatController.text = unsentText;
-      _chatController.selection =
-          TextSelection.collapsed(offset: _chatController.text.length);
+      _chatController.selection = TextSelection.collapsed(
+        offset: _chatController.text.length,
+      );
     });
   }
 
@@ -450,8 +454,8 @@ class _RoomScreenState extends State<RoomScreen> {
     final threadId = threadView?.threadId;
     final UploadsStatus threadStatus = attachEnabled && threadId != null
         ? _state.uploadTracker
-            .threadUploads(widget.roomId, threadId)
-            .watch(context)
+              .threadUploads(widget.roomId, threadId)
+              .watch(context)
         : const UploadsLoaded(<DisplayUpload>[]);
 
     return Column(
@@ -477,16 +481,14 @@ class _RoomScreenState extends State<RoomScreen> {
     final chip = _buildChipSegment(roomStatus, threadStatus, theme);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: EdgeInsets.symmetric(
+        horizontal: SoliplexSpacing.s4,
+        vertical: SoliplexSpacing.s2,
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Expanded(
-            child: Text(
-              roomName,
-              style: theme.textTheme.titleMedium,
-            ),
-          ),
+          Expanded(child: Text(roomName, style: theme.textTheme.titleMedium)),
           if (chip != null)
             Material(
               color: theme.colorScheme.secondaryContainer,
@@ -548,7 +550,10 @@ class _RoomScreenState extends State<RoomScreen> {
     return InkWell(
       onTap: () => setState(() => _filesExpanded = !_filesExpanded),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: EdgeInsets.symmetric(
+          horizontal: SoliplexSpacing.s3,
+          vertical: SoliplexSpacing.s2,
+        ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -574,31 +579,29 @@ class _RoomScreenState extends State<RoomScreen> {
       s is UploadsLoaded ? s.uploads : null;
 
   bool _scopeRendersContent(UploadsStatus s) => switch (s) {
-        UploadsLoading() => true,
-        UploadsLoaded(uploads: final u) => u.isNotEmpty,
-        UploadsFailed() => true,
-      };
+    UploadsLoading() => true,
+    UploadsLoaded(uploads: final u) => u.isNotEmpty,
+    UploadsFailed() => true,
+  };
 
-  Widget _buildFilePanel(
-    UploadsStatus roomStatus,
-    UploadsStatus threadStatus,
-  ) {
+  Widget _buildFilePanel(UploadsStatus roomStatus, UploadsStatus threadStatus) {
     final theme = Theme.of(context);
     final roomFiles = _uploadsOrNull(roomStatus);
     final threadFiles = _uploadsOrNull(threadStatus);
-    final bothEmpty = (roomFiles?.isEmpty ?? true) &&
+    final bothEmpty =
+        (roomFiles?.isEmpty ?? true) &&
         (threadFiles?.isEmpty ?? true) &&
         roomStatus is UploadsLoaded &&
         threadStatus is UploadsLoaded;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding: EdgeInsets.symmetric(horizontal: SoliplexSpacing.s2),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(8),
+        padding: EdgeInsets.all(SoliplexSpacing.s2),
         decoration: BoxDecoration(
           color: theme.colorScheme.surfaceContainerLow,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(soliplexRadii.sm),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -634,41 +637,41 @@ class _RoomScreenState extends State<RoomScreen> {
   ) {
     return switch (status) {
       UploadsLoading() => Row(
-          children: [
-            _sectionLabel(label, theme),
-            const SizedBox(width: 8),
-            const SizedBox(
-              width: 12,
-              height: 12,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            ),
-          ],
-        ),
+        children: [
+          _sectionLabel(label, theme),
+          SizedBox(width: SoliplexSpacing.s2),
+          const SizedBox(
+            width: 12,
+            height: 12,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+        ],
+      ),
       UploadsLoaded(uploads: final list) when list.isEmpty => const SizedBox(),
       UploadsLoaded(uploads: final list) => Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _sectionLabel(label, theme),
-            for (final entry in list) _buildFileRow(entry),
-          ],
-        ),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _sectionLabel(label, theme),
+          for (final entry in list) _buildFileRow(entry),
+        ],
+      ),
       UploadsFailed(error: final error) => Row(
-          children: [
-            _sectionLabel(label, theme),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                'Failed to load: ${uploadErrorMessage(error)}',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.error,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+        children: [
+          _sectionLabel(label, theme),
+          SizedBox(width: SoliplexSpacing.s2),
+          Expanded(
+            child: Text(
+              'Failed to load: ${uploadErrorMessage(error)}',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.error,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-          ],
-        ),
+          ),
+        ],
+      ),
     };
   }
 
@@ -687,18 +690,18 @@ class _RoomScreenState extends State<RoomScreen> {
     final isFailed = entry is FailedUpload;
     final (icon, color, errorMessage, dismissible) = switch (entry) {
       PersistedUpload() => (
-          Icons.check_circle_outline,
-          theme.colorScheme.primary,
-          null,
-          false,
-        ),
+        Icons.check_circle_outline,
+        theme.colorScheme.primary,
+        null,
+        false,
+      ),
       PendingUpload() => (null, theme.colorScheme.primary, null, false),
       FailedUpload(message: final m) => (
-          Icons.error_outline,
-          theme.colorScheme.onErrorContainer,
-          m,
-          true,
-        ),
+        Icons.error_outline,
+        theme.colorScheme.onErrorContainer,
+        m,
+        true,
+      ),
     };
 
     final dismissId = entry is FailedUpload ? entry.id : null;
@@ -706,7 +709,7 @@ class _RoomScreenState extends State<RoomScreen> {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 2),
       padding: isFailed
-          ? const EdgeInsets.symmetric(horizontal: 8, vertical: 4)
+          ? EdgeInsets.symmetric(horizontal: SoliplexSpacing.s2, vertical: 4)
           : null,
       decoration: isFailed
           ? BoxDecoration(
@@ -724,7 +727,7 @@ class _RoomScreenState extends State<RoomScreen> {
               height: 16,
               child: CircularProgressIndicator(strokeWidth: 2, color: color),
             ),
-          const SizedBox(width: 8),
+          SizedBox(width: SoliplexSpacing.s2),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -755,7 +758,7 @@ class _RoomScreenState extends State<RoomScreen> {
               color: theme.colorScheme.onErrorContainer,
               onPressed: () => _state.uploadTracker.dismissFailed(dismissId),
               padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
+              constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
               visualDensity: VisualDensity.compact,
             ),
         ],
@@ -776,18 +779,15 @@ class _RoomScreenState extends State<RoomScreen> {
             onSuggestionTapped: sessionState != null
                 ? null
                 : (suggestion) => _state.sendToNewThread(
-                      suggestion,
-                      stateOverlay: _buildStateOverlay(),
-                    ),
+                    suggestion,
+                    stateOverlay: _buildStateOverlay(),
+                  ),
             onQuizTapped: _onQuizTapped,
             fallback: const Center(child: Text('Select a thread')),
           ),
         ),
         if (roomError != null)
-          _SendErrorBanner(
-            error: roomError,
-            onDismiss: _state.clearError,
-          ),
+          _SendErrorBanner(error: roomError, onDismiss: _state.clearError),
         if (room?.enableAttachments ?? false)
           UploadEventBanner(
             tracker: _state.uploadTracker,
@@ -795,10 +795,8 @@ class _RoomScreenState extends State<RoomScreen> {
             threadId: null,
           ),
         ChatInput(
-          onSend: (text) => _state.sendToNewThread(
-            text,
-            stateOverlay: _buildStateOverlay(),
-          ),
+          onSend: (text) =>
+              _state.sendToNewThread(text, stateOverlay: _buildStateOverlay()),
           onCancel: _state.cancelSpawn,
           sessionState: _state.sessionState,
           controller: _chatController,
@@ -806,9 +804,8 @@ class _RoomScreenState extends State<RoomScreen> {
           selectedDocuments: _selectedDocuments,
           onFilterTap: _filterEnabled ? _openDocumentPicker : null,
           onDocumentRemoved: _filterEnabled
-              ? (doc) => _updateSelection(
-                    Set.of(_selectedDocuments)..remove(doc),
-                  )
+              ? (doc) =>
+                    _updateSelection(Set.of(_selectedDocuments)..remove(doc))
               : null,
           onAttachFile: (room?.enableAttachments ?? false)
               ? _pickAndUploadToNewThread
@@ -831,23 +828,23 @@ class _RoomScreenState extends State<RoomScreen> {
         Expanded(
           child: switch (status) {
             MessagesLoading() => const Center(
-                child: CircularProgressIndicator(),
-              ),
+              child: CircularProgressIndicator(),
+            ),
             MessagesFailed(:final error) => ErrorRetryPanel(
-                title: 'Failed to load messages',
-                error: error,
-                onRetry: threadView.refresh,
-              ),
+              title: 'Failed to load messages',
+              error: error,
+              onRetry: threadView.refresh,
+            ),
             MessagesLoaded(:final messages, :final messageStates) =>
               computeDisplayMessages(messages, streaming).isEmpty
                   ? RoomWelcome(
                       room: room,
                       onSuggestionTapped: (suggestion) =>
                           threadView.sendMessage(
-                        suggestion,
-                        _state.runtime,
-                        stateOverlay: _buildStateOverlay(),
-                      ),
+                            suggestion,
+                            _state.runtime,
+                            stateOverlay: _buildStateOverlay(),
+                          ),
                       onQuizTapped: _onQuizTapped,
                       fallback: _threadEmptyFallback(context),
                     )
@@ -860,8 +857,9 @@ class _RoomScreenState extends State<RoomScreen> {
                       executionTrackers: threadView.executionTrackers,
                       onFeedbackSubmit: threadView.submitFeedback,
                       onInspect: (runId) {
-                        final inspector = ProviderScope.containerOf(context)
-                            .read(networkInspectorProvider);
+                        final inspector = ProviderScope.containerOf(
+                          context,
+                        ).read(networkInspectorProvider);
                         final filtered = filterEventsByRunId(
                           inspector.events,
                           runId,
@@ -875,13 +873,13 @@ class _RoomScreenState extends State<RoomScreen> {
                       },
                       onShowChunkVisualization: (ref) =>
                           ChunkVisualizationPage.show(
-                        context: context,
-                        api: widget.serverEntry.connection.api,
-                        roomId: widget.roomId,
-                        chunkId: ref.chunkId,
-                        documentTitle: ref.displayTitle,
-                        pageNumbers: ref.pageNumbers,
-                      ),
+                            context: context,
+                            api: widget.serverEntry.connection.api,
+                            roomId: widget.roomId,
+                            chunkId: ref.chunkId,
+                            documentTitle: ref.displayTitle,
+                            pageNumbers: ref.pageNumbers,
+                          ),
                     ),
           },
         ),
@@ -910,9 +908,8 @@ class _RoomScreenState extends State<RoomScreen> {
           selectedDocuments: _selectedDocuments,
           onFilterTap: _filterEnabled ? _openDocumentPicker : null,
           onDocumentRemoved: _filterEnabled
-              ? (doc) => _updateSelection(
-                    Set.of(_selectedDocuments)..remove(doc),
-                  )
+              ? (doc) =>
+                    _updateSelection(Set.of(_selectedDocuments)..remove(doc))
               : null,
           onAttachFile: attachEnabled
               ? () => _pickAndUploadToThread(threadView.threadId)
@@ -928,10 +925,12 @@ class _RoomScreenState extends State<RoomScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.chat_bubble_outline,
-              size: 48,
-              color: theme.colorScheme.outline.withValues(alpha: 0.3)),
-          const SizedBox(height: 12),
+          Icon(
+            Icons.chat_bubble_outline,
+            size: 48,
+            color: theme.colorScheme.outline.withValues(alpha: 0.3),
+          ),
+          SizedBox(height: SoliplexSpacing.s3),
           Text(
             'Type a message to get started',
             style: theme.textTheme.bodyMedium?.copyWith(
@@ -955,12 +954,15 @@ class _SendErrorBanner extends StatelessWidget {
     final theme = Theme.of(context);
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: EdgeInsets.symmetric(
+        horizontal: SoliplexSpacing.s3,
+        vertical: SoliplexSpacing.s2,
+      ),
       color: theme.colorScheme.errorContainer,
       child: Row(
         children: [
           Icon(Icons.error_outline, size: 16, color: theme.colorScheme.error),
-          const SizedBox(width: 8),
+          SizedBox(width: SoliplexSpacing.s2),
           Expanded(
             child: Text(
               error.error.toString(),
