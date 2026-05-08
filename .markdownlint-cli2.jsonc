@@ -1,7 +1,12 @@
 {
   "ignores": [
     ".dart_tool/**",
+    "build/**",
     "linux/**",
-    "windows/**"
+    "windows/**",
+    "ios/Pods/**",
+    "macos/Pods/**",
+    "**/.symlinks/**",
+    "docs/design-system/handoff/**"
   ]
 }
