@@ -37,28 +37,28 @@ RunInfo _runInfo() =>
     RunInfo(id: _runId, threadId: _key.threadId, createdAt: DateTime(2026));
 
 List<BaseEvent> _happyPathEvents() => [
-      const RunStartedEvent(threadId: 'thread-1', runId: _runId),
-      const TextMessageStartEvent(messageId: 'msg-1'),
-      const TextMessageContentEvent(messageId: 'msg-1', delta: 'Hello'),
-      const TextMessageEndEvent(messageId: 'msg-1'),
-      const RunFinishedEvent(threadId: 'thread-1', runId: _runId),
-    ];
+  const RunStartedEvent(threadId: 'thread-1', runId: _runId),
+  const TextMessageStartEvent(messageId: 'msg-1'),
+  const TextMessageContentEvent(messageId: 'msg-1', delta: 'Hello'),
+  const TextMessageEndEvent(messageId: 'msg-1'),
+  const RunFinishedEvent(threadId: 'thread-1', runId: _runId),
+];
 
 List<BaseEvent> _toolCallEvents({String toolName = 'weather'}) => [
-      const RunStartedEvent(threadId: 'thread-1', runId: _runId),
-      ToolCallStartEvent(toolCallId: 'tc-1', toolCallName: toolName),
-      const ToolCallArgsEvent(toolCallId: 'tc-1', delta: '{"city":"NYC"}'),
-      const ToolCallEndEvent(toolCallId: 'tc-1'),
-      const RunFinishedEvent(threadId: 'thread-1', runId: _runId),
-    ];
+  const RunStartedEvent(threadId: 'thread-1', runId: _runId),
+  ToolCallStartEvent(toolCallId: 'tc-1', toolCallName: toolName),
+  const ToolCallArgsEvent(toolCallId: 'tc-1', delta: '{"city":"NYC"}'),
+  const ToolCallEndEvent(toolCallId: 'tc-1'),
+  const RunFinishedEvent(threadId: 'thread-1', runId: _runId),
+];
 
 List<BaseEvent> _resumeTextEvents() => [
-      const RunStartedEvent(threadId: 'thread-1', runId: _runId),
-      const TextMessageStartEvent(messageId: 'msg-2'),
-      const TextMessageContentEvent(messageId: 'msg-2', delta: 'Sunny'),
-      const TextMessageEndEvent(messageId: 'msg-2'),
-      const RunFinishedEvent(threadId: 'thread-1', runId: _runId),
-    ];
+  const RunStartedEvent(threadId: 'thread-1', runId: _runId),
+  const TextMessageStartEvent(messageId: 'msg-2'),
+  const TextMessageContentEvent(messageId: 'msg-2', delta: 'Sunny'),
+  const TextMessageEndEvent(messageId: 'msg-2'),
+  const RunFinishedEvent(threadId: 'thread-1', runId: _runId),
+];
 
 ToolRegistry _registryWith({String toolName = 'weather'}) {
   return const ToolRegistry().register(
@@ -70,14 +70,14 @@ ToolRegistry _registryWith({String toolName = 'weather'}) {
 }
 
 List<ToolCallInfo> _executedTools() => [
-      const ToolCallInfo(
-        id: 'tc-1',
-        name: 'weather',
-        arguments: '{"city":"NYC"}',
-        status: ToolCallStatus.completed,
-        result: '72°F, sunny',
-      ),
-    ];
+  const ToolCallInfo(
+    id: 'tc-1',
+    name: 'weather',
+    arguments: '{"city":"NYC"}',
+    status: ToolCallStatus.completed,
+    result: '72°F, sunny',
+  ),
+];
 
 void main() {
   setUpAll(() {
@@ -537,38 +537,40 @@ void main() {
       expect(rag['document_filter'], "id = 'abc-123'");
     });
 
-    test('runToCompletion merges stateOverlay with cachedHistory aguiState',
-        () async {
-      stubCreateRun();
-      stubRunAgent(stream: Stream.fromIterable(_happyPathEvents()));
+    test(
+      'runToCompletion merges stateOverlay with cachedHistory aguiState',
+      () async {
+        stubCreateRun();
+        stubRunAgent(stream: Stream.fromIterable(_happyPathEvents()));
 
-      final history = ThreadHistory(
-        messages: const [],
-        aguiState: const {
-          'rag': <String, dynamic>{
-            'citations': <int>[1, 2, 3],
+        final history = ThreadHistory(
+          messages: const [],
+          aguiState: const {
+            'rag': <String, dynamic>{
+              'citations': <int>[1, 2, 3],
+            },
+            'other': 'data',
           },
-          'other': 'data',
-        },
-      );
+        );
 
-      final result = await orchestrator.runToCompletion(
-        key: _key,
-        userMessage: 'test',
-        toolExecutor: (_) async => [],
-        cachedHistory: history,
-        stateOverlay: {
-          'rag': <String, dynamic>{'document_filter': "id = 'abc-123'"},
-        },
-      );
+        final result = await orchestrator.runToCompletion(
+          key: _key,
+          userMessage: 'test',
+          toolExecutor: (_) async => [],
+          cachedHistory: history,
+          stateOverlay: {
+            'rag': <String, dynamic>{'document_filter': "id = 'abc-123'"},
+          },
+        );
 
-      expect(result, isA<CompletedState>());
-      final completed = result as CompletedState;
-      final rag = completed.conversation.aguiState['rag'] as Map;
-      expect(rag['document_filter'], "id = 'abc-123'");
-      expect(rag['citations'], [1, 2, 3]);
-      expect(completed.conversation.aguiState['other'], 'data');
-    });
+        expect(result, isA<CompletedState>());
+        final completed = result as CompletedState;
+        final rag = completed.conversation.aguiState['rag'] as Map;
+        expect(rag['document_filter'], "id = 'abc-123'");
+        expect(rag['citations'], [1, 2, 3]);
+        expect(completed.conversation.aguiState['other'], 'data');
+      },
+    );
 
     test('deep-merges nested maps recursively', () async {
       stubCreateRun();
@@ -578,10 +580,7 @@ void main() {
         messages: const [],
         aguiState: const {
           'rag': <String, dynamic>{
-            'config': <String, dynamic>{
-              'maxChunks': 5,
-              'strategy': 'semantic',
-            },
+            'config': <String, dynamic>{'maxChunks': 5, 'strategy': 'semantic'},
           },
         },
       );
@@ -593,9 +592,7 @@ void main() {
         cachedHistory: history,
         stateOverlay: {
           'rag': <String, dynamic>{
-            'config': <String, dynamic>{
-              'maxChunks': 10,
-            },
+            'config': <String, dynamic>{'maxChunks': 10},
           },
         },
       );
@@ -614,9 +611,7 @@ void main() {
 
       final history = ThreadHistory(
         messages: const [],
-        aguiState: const {
-          'rag': 'old-string-value',
-        },
+        aguiState: const {'rag': 'old-string-value'},
       );
 
       final result = await orchestrator.runToCompletion(
@@ -631,10 +626,9 @@ void main() {
 
       expect(result, isA<CompletedState>());
       final completed = result as CompletedState;
-      expect(
-        completed.conversation.aguiState['rag'],
-        {'document_filter': "id = 'x-1'"},
-      );
+      expect(completed.conversation.aguiState['rag'], {
+        'document_filter': "id = 'x-1'",
+      });
     });
 
     test('overlay scalar replaces existing map', () async {
@@ -704,9 +698,7 @@ void main() {
       final history = ThreadHistory(
         messages: const [],
         aguiState: const {
-          'rag': <String, dynamic>{
-            'existing': 'value',
-          },
+          'rag': <String, dynamic>{'existing': 'value'},
         },
       );
 
@@ -750,12 +742,9 @@ void main() {
 
       expect(result, isA<CompletedState>());
       final completed = result as CompletedState;
-      expect(
-        completed.conversation.aguiState['rag'],
-        {
-          'citations': [1],
-        },
-      );
+      expect(completed.conversation.aguiState['rag'], {
+        'citations': [1],
+      });
     });
   });
 
@@ -1115,7 +1104,8 @@ void main() {
         expect(
           subscriptionCancelled,
           isFalse,
-          reason: 'dispose() after RunFinishedEvent must not cancel '
+          reason:
+              'dispose() after RunFinishedEvent must not cancel '
               'the subscription to avoid poisoning the server '
               'connection pool',
         );
@@ -1478,33 +1468,33 @@ void main() {
 
   group('citation extraction', () {
     List<BaseEvent> citationEvents() => [
-          const RunStartedEvent(threadId: 'thread-1', runId: _runId),
-          const TextMessageStartEvent(messageId: 'msg-1'),
-          const TextMessageContentEvent(messageId: 'msg-1', delta: 'Answer'),
-          const StateSnapshotEvent(
-            snapshot: {
-              'rag': {
-                'qa_history': [
+      const RunStartedEvent(threadId: 'thread-1', runId: _runId),
+      const TextMessageStartEvent(messageId: 'msg-1'),
+      const TextMessageContentEvent(messageId: 'msg-1', delta: 'Answer'),
+      const StateSnapshotEvent(
+        snapshot: {
+          'rag': {
+            'qa_history': [
+              {
+                'question': 'Q1',
+                'answer': 'A1',
+                'citations': [
                   {
-                    'question': 'Q1',
-                    'answer': 'A1',
-                    'citations': [
-                      {
-                        'chunk_id': 'chunk-1',
-                        'content': 'Citation text',
-                        'document_id': 'doc-1',
-                        'document_uri': 'https://example.com/doc.pdf',
-                      },
-                    ],
+                    'chunk_id': 'chunk-1',
+                    'content': 'Citation text',
+                    'document_id': 'doc-1',
+                    'document_uri': 'https://example.com/doc.pdf',
                   },
                 ],
-                'citation_registry': <String, int>{},
               },
-            },
-          ),
-          const TextMessageEndEvent(messageId: 'msg-1'),
-          const RunFinishedEvent(threadId: 'thread-1', runId: _runId),
-        ];
+            ],
+            'citation_registry': <String, int>{},
+          },
+        },
+      ),
+      const TextMessageEndEvent(messageId: 'msg-1'),
+      const RunFinishedEvent(threadId: 'thread-1', runId: _runId),
+    ];
 
     test('populates messageStates with citations on CompletedState', () async {
       stubCreateRun();
@@ -1575,14 +1565,8 @@ void main() {
             },
           },
         ),
-        const ToolCallStartEvent(
-          toolCallId: 'tc-1',
-          toolCallName: 'weather',
-        ),
-        const ToolCallArgsEvent(
-          toolCallId: 'tc-1',
-          delta: '{"city":"NYC"}',
-        ),
+        const ToolCallStartEvent(toolCallId: 'tc-1', toolCallName: 'weather'),
+        const ToolCallArgsEvent(toolCallId: 'tc-1', delta: '{"city":"NYC"}'),
         const ToolCallEndEvent(toolCallId: 'tc-1'),
         const RunFinishedEvent(threadId: 'thread-1', runId: _runId),
       ];
@@ -1789,10 +1773,7 @@ void main() {
         return Stream.fromIterable([
           const RunStartedEvent(threadId: 'thread-1', runId: _runId),
           const TextMessageStartEvent(messageId: 'msg-2'),
-          const TextMessageContentEvent(
-            messageId: 'msg-2',
-            delta: 'Done',
-          ),
+          const TextMessageContentEvent(messageId: 'msg-2', delta: 'Done'),
           const StateSnapshotEvent(
             snapshot: {
               'rag': {

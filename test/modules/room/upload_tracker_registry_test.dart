@@ -80,8 +80,11 @@ void main() {
 
       servers.value = {'srv-2': e2};
 
-      expect(t1.isDisposed, isTrue,
-          reason: "evicted tracker must be disposed, not just removed");
+      expect(
+        t1.isDisposed,
+        isTrue,
+        reason: "evicted tracker must be disposed, not just removed",
+      );
       expect(t2.isDisposed, isFalse);
 
       // The registry gives out a fresh instance on re-request for the

@@ -65,42 +65,41 @@ void main() {
     );
   });
 
-  test(
-    'throws PickFilePickerException when picker returns neither bytes nor '
-    'path',
-    () async {
-      FilePickerPlatform.instance = _FakeFilePicker.result(
-        FilePickerResult([PlatformFile(name: 'x.pdf', size: 0)]),
-      );
-
-      expect(
-        pickFile(),
-        throwsA(
-          isA<PickFilePickerException>()
-              .having((e) => e.filename, 'filename', 'x.pdf')
-              .having((e) => e.cause, 'cause', isA<StateError>()),
-        ),
-      );
-    },
-  );
-
-  test('returns PickedFile with bytes and derived MIME when bytes present',
-      () async {
+  test('throws PickFilePickerException when picker returns neither bytes nor '
+      'path', () async {
     FilePickerPlatform.instance = _FakeFilePicker.result(
-      FilePickerResult([
-        PlatformFile(
-          name: 'doc.pdf',
-          size: 3,
-          bytes: Uint8List.fromList(const [1, 2, 3]),
-        ),
-      ]),
+      FilePickerResult([PlatformFile(name: 'x.pdf', size: 0)]),
     );
 
-    final picked = await pickFile();
-
-    expect(picked, isNotNull);
-    expect(picked!.name, 'doc.pdf');
-    expect(picked.bytes, [1, 2, 3]);
-    expect(picked.mimeType, 'application/pdf');
+    expect(
+      pickFile(),
+      throwsA(
+        isA<PickFilePickerException>()
+            .having((e) => e.filename, 'filename', 'x.pdf')
+            .having((e) => e.cause, 'cause', isA<StateError>()),
+      ),
+    );
   });
+
+  test(
+    'returns PickedFile with bytes and derived MIME when bytes present',
+    () async {
+      FilePickerPlatform.instance = _FakeFilePicker.result(
+        FilePickerResult([
+          PlatformFile(
+            name: 'doc.pdf',
+            size: 3,
+            bytes: Uint8List.fromList(const [1, 2, 3]),
+          ),
+        ]),
+      );
+
+      final picked = await pickFile();
+
+      expect(picked, isNotNull);
+      expect(picked!.name, 'doc.pdf');
+      expect(picked.bytes, [1, 2, 3]);
+      expect(picked.mimeType, 'application/pdf');
+    },
+  );
 }

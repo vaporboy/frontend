@@ -19,9 +19,9 @@ List<ChatMessage> computeDisplayMessages(
   if (streaming == null) return messages;
   return switch (streaming) {
     AwaitingText() => [
-        ...messages,
-        LoadingMessage.create(id: loadingMessageId)
-      ],
+      ...messages,
+      LoadingMessage.create(id: loadingMessageId),
+    ],
     TextStreaming(
       :final messageId,
       :final user,

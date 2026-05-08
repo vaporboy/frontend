@@ -15,10 +15,10 @@ class ThreadHistory {
     Map<String, dynamic> aguiState = const {},
     Map<String, MessageState> messageStates = const {},
     List<RunEventBundle> runs = const [],
-  })  : messages = List.unmodifiable(messages),
-        aguiState = Map.unmodifiable(aguiState),
-        messageStates = Map.unmodifiable(messageStates),
-        runs = List.unmodifiable(runs);
+  }) : messages = List.unmodifiable(messages),
+       aguiState = Map.unmodifiable(aguiState),
+       messageStates = Map.unmodifiable(messageStates),
+       runs = List.unmodifiable(runs);
 
   /// Messages in the thread, ordered chronologically.
   final List<ChatMessage> messages;
@@ -50,7 +50,7 @@ class ThreadHistory {
 class RunEventBundle {
   /// Creates a bundle of decoded events for [runId].
   RunEventBundle({required this.runId, required List<BaseEvent> events})
-      : events = List.unmodifiable(events);
+    : events = List.unmodifiable(events);
 
   /// The run these events belong to.
   final String runId;

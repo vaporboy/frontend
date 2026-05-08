@@ -38,12 +38,11 @@ void main() {
     String roomId = _roomId,
     String messageId = _messageId,
     ExecutionTracker? t,
-  }) =>
-      ExecutionTimeline(
-        roomId: roomId,
-        messageId: messageId,
-        tracker: t ?? tracker,
-      );
+  }) => ExecutionTimeline(
+    roomId: roomId,
+    messageId: messageId,
+    tracker: t ?? tracker,
+  );
 
   testWidgets('renders nothing for empty timeline', (tester) async {
     await tester.pumpWidget(wrap(build()));
@@ -160,10 +159,7 @@ void main() {
     events.value = const ActivitySnapshot(
       messageId: 'rag:call_1',
       activityType: 'skill_tool_call',
-      content: {
-        'tool_name': 'lookup',
-        'args': '{"doc_id":"abc"}',
-      },
+      content: {'tool_name': 'lookup', 'args': '{"doc_id":"abc"}'},
       timestamp: 100,
     );
 
@@ -199,10 +195,7 @@ void main() {
     events.value = const ActivitySnapshot(
       messageId: 'bwrap:call_1',
       activityType: 'skill_tool_call',
-      content: {
-        'tool_name': 'execute_script',
-        'args': '{"script":"x=1"}',
-      },
+      content: {'tool_name': 'execute_script', 'args': '{"script":"x=1"}'},
       timestamp: 100,
     );
 
@@ -215,13 +208,13 @@ void main() {
   });
 
   group('MessageExpansions persistence', () {
-    testWidgets('header expansion persists across parent-key swap',
-        (tester) async {
+    testWidgets('header expansion persists across parent-key swap', (
+      tester,
+    ) async {
       events.value = const ThinkingStarted();
 
-      Widget tree(Key parentKey) => wrap(
-            KeyedSubtree(key: parentKey, child: build()),
-          );
+      Widget tree(Key parentKey) =>
+          wrap(KeyedSubtree(key: parentKey, child: build()));
 
       await tester.pumpWidget(tree(const ValueKey('A')));
       await tester.pump();
@@ -236,8 +229,9 @@ void main() {
       expect(find.text('Thinking'), findsOneWidget);
     });
 
-    testWidgets('source expansion persists across parent-key swap',
-        (tester) async {
+    testWidgets('source expansion persists across parent-key swap', (
+      tester,
+    ) async {
       events.value = const ClientToolExecuting(
         toolName: 'execute_skill',
         toolCallId: 'tc-1',
@@ -252,9 +246,8 @@ void main() {
         timestamp: 100,
       );
 
-      Widget tree(Key parentKey) => wrap(
-            KeyedSubtree(key: parentKey, child: build()),
-          );
+      Widget tree(Key parentKey) =>
+          wrap(KeyedSubtree(key: parentKey, child: build()));
 
       await tester.pumpWidget(tree(const ValueKey('A')));
       await tester.pump();
@@ -284,13 +277,17 @@ void main() {
 
       // Three widgets: (r1, m1), (r1, other-msg), (other-room, m1).
       // Tapping the first must not affect the other two.
-      await tester.pumpWidget(wrap(Column(
-        children: [
-          build(),
-          build(messageId: 'other-msg', t: tracker2),
-          build(roomId: 'other-room', t: tracker3),
-        ],
-      )));
+      await tester.pumpWidget(
+        wrap(
+          Column(
+            children: [
+              build(),
+              build(messageId: 'other-msg', t: tracker2),
+              build(roomId: 'other-room', t: tracker3),
+            ],
+          ),
+        ),
+      );
       await tester.pump();
       expect(find.text('1 event'), findsNWidgets(3));
 
@@ -304,9 +301,8 @@ void main() {
     testWidgets('collapse persists across parent-key swap', (tester) async {
       events.value = const ThinkingStarted();
 
-      Widget tree(Key parentKey) => wrap(
-            KeyedSubtree(key: parentKey, child: build()),
-          );
+      Widget tree(Key parentKey) =>
+          wrap(KeyedSubtree(key: parentKey, child: build()));
 
       await tester.pumpWidget(tree(const ValueKey('A')));
       await tester.pump();
@@ -324,8 +320,9 @@ void main() {
       expect(find.text('Thinking'), findsNothing);
     });
 
-    testWidgets('header toggle in loading phase uses local state only',
-        (tester) async {
+    testWidgets('header toggle in loading phase uses local state only', (
+      tester,
+    ) async {
       events.value = const ThinkingStarted();
 
       await tester.pumpWidget(wrap(build(messageId: loadingMessageId)));
@@ -340,8 +337,9 @@ void main() {
       expect(store.debugHasStateFor(_roomId, loadingMessageId), isFalse);
     });
 
-    testWidgets('source toggle in loading phase uses local state only',
-        (tester) async {
+    testWidgets('source toggle in loading phase uses local state only', (
+      tester,
+    ) async {
       events.value = const ClientToolExecuting(
         toolName: 'execute_skill',
         toolCallId: 'tc-1',

@@ -4,9 +4,7 @@ import 'execution_step.dart';
 import 'ui/execution/timeline_entry.dart';
 
 class ExecutionTracker {
-  ExecutionTracker({
-    required ReadonlySignal<ExecutionEvent?> executionEvents,
-  }) {
+  ExecutionTracker({required ReadonlySignal<ExecutionEvent?> executionEvents}) {
     _stopwatch.start();
     _unsub = executionEvents.subscribe(_onEvent);
   }
@@ -32,8 +30,9 @@ class ExecutionTracker {
   bool _isFrozen = false;
   bool get isFrozen => _isFrozen;
 
-  final Signal<List<ExecutionStep>> _steps =
-      Signal<List<ExecutionStep>>(const []);
+  final Signal<List<ExecutionStep>> _steps = Signal<List<ExecutionStep>>(
+    const [],
+  );
   ReadonlySignal<List<ExecutionStep>> get steps => _steps;
 
   final Signal<List<String>> _thinkingBlocks = Signal<List<String>>(const []);
@@ -56,8 +55,9 @@ class ExecutionTracker {
   /// order. Activities that arrive while a step is active are nested
   /// under that step; activities arriving outside any active step are
   /// emitted as [TimelineOrphanActivity].
-  final Signal<List<TimelineEntry>> _timeline =
-      Signal<List<TimelineEntry>>(const []);
+  final Signal<List<TimelineEntry>> _timeline = Signal<List<TimelineEntry>>(
+    const [],
+  );
   ReadonlySignal<List<TimelineEntry>> get timeline => _timeline;
 
   void freeze() {
@@ -103,12 +103,12 @@ class ExecutionTracker {
         _completeAllSteps(StepStatus.failed);
         _isThinkingStreaming.value = false;
       case ActivitySnapshot(
-          :final messageId,
-          :final activityType,
-          :final content,
-          :final timestamp,
-          :final replace,
-        ):
+        :final messageId,
+        :final activityType,
+        :final content,
+        :final timestamp,
+        :final replace,
+      ):
         _upsertSkillToolCall(
           messageId: messageId,
           activityType: activityType,
@@ -117,10 +117,10 @@ class ExecutionTracker {
           replace: replace,
         );
       case TextDelta() ||
-            StateUpdated() ||
-            StepProgress() ||
-            AwaitingApproval() ||
-            CustomExecutionEvent():
+          StateUpdated() ||
+          StepProgress() ||
+          AwaitingApproval() ||
+          CustomExecutionEvent():
         break;
     }
   }
@@ -216,8 +216,9 @@ class ExecutionTracker {
     for (var i = 0; i < current.length; i++) {
       final entry = current[i];
       if (entry is TimelineStep) {
-        final aIdx = entry.activities
-            .indexWhere((a) => a.messageId == decoded.messageId);
+        final aIdx = entry.activities.indexWhere(
+          (a) => a.messageId == decoded.messageId,
+        );
         if (aIdx >= 0) {
           final updated = [...entry.activities]..[aIdx] = decoded;
           _timeline.value = [...current]..[i] = entry.withActivities(updated);
@@ -225,16 +226,19 @@ class ExecutionTracker {
         }
       } else if (entry is TimelineOrphanActivity &&
           entry.activity.messageId == decoded.messageId) {
-        _timeline.value = [...current]..[i] =
-            TimelineOrphanActivity(activity: decoded);
+        _timeline.value = [...current]
+          ..[i] = TimelineOrphanActivity(activity: decoded);
         return;
       }
     }
     if (current.isNotEmpty && current.last is TimelineStep) {
       final lastStep = current.last as TimelineStep;
       if (lastStep.step.status == StepStatus.active) {
-        _timeline.value = [...current]..[current.length - 1] =
-            lastStep.withActivities([...lastStep.activities, decoded]);
+        _timeline.value = [...current]
+          ..[current.length - 1] = lastStep.withActivities([
+            ...lastStep.activities,
+            decoded,
+          ]);
         return;
       }
     }

@@ -66,38 +66,38 @@ ThreadInfo _threadInfo() =>
     ThreadInfo(id: _threadId, roomId: _roomId, createdAt: DateTime(2026));
 
 ThreadInfo _threadInfoWithRun() => ThreadInfo(
-      id: _threadId,
-      roomId: _roomId,
-      initialRunId: _runId,
-      createdAt: DateTime(2026),
-    );
+  id: _threadId,
+  roomId: _roomId,
+  initialRunId: _runId,
+  createdAt: DateTime(2026),
+);
 
 RunInfo _runInfo() =>
     RunInfo(id: _runId, threadId: _threadId, createdAt: DateTime(2026));
 
 List<BaseEvent> _happyPathEvents() => [
-      const RunStartedEvent(threadId: _threadId, runId: _runId),
-      const TextMessageStartEvent(messageId: 'msg-1'),
-      const TextMessageContentEvent(messageId: 'msg-1', delta: 'Hello'),
-      const TextMessageEndEvent(messageId: 'msg-1'),
-      const RunFinishedEvent(threadId: _threadId, runId: _runId),
-    ];
+  const RunStartedEvent(threadId: _threadId, runId: _runId),
+  const TextMessageStartEvent(messageId: 'msg-1'),
+  const TextMessageContentEvent(messageId: 'msg-1', delta: 'Hello'),
+  const TextMessageEndEvent(messageId: 'msg-1'),
+  const RunFinishedEvent(threadId: _threadId, runId: _runId),
+];
 
 List<BaseEvent> _toolCallEvents() => [
-      const RunStartedEvent(threadId: _threadId, runId: _runId),
-      const ToolCallStartEvent(toolCallId: 'tc-1', toolCallName: 'weather'),
-      const ToolCallArgsEvent(toolCallId: 'tc-1', delta: '{"city":"NYC"}'),
-      const ToolCallEndEvent(toolCallId: 'tc-1'),
-      const RunFinishedEvent(threadId: _threadId, runId: _runId),
-    ];
+  const RunStartedEvent(threadId: _threadId, runId: _runId),
+  const ToolCallStartEvent(toolCallId: 'tc-1', toolCallName: 'weather'),
+  const ToolCallArgsEvent(toolCallId: 'tc-1', delta: '{"city":"NYC"}'),
+  const ToolCallEndEvent(toolCallId: 'tc-1'),
+  const RunFinishedEvent(threadId: _threadId, runId: _runId),
+];
 
 List<BaseEvent> _resumeTextEvents() => [
-      const RunStartedEvent(threadId: _threadId, runId: _runId),
-      const TextMessageStartEvent(messageId: 'msg-2'),
-      const TextMessageContentEvent(messageId: 'msg-2', delta: 'Sunny'),
-      const TextMessageEndEvent(messageId: 'msg-2'),
-      const RunFinishedEvent(threadId: _threadId, runId: _runId),
-    ];
+  const RunStartedEvent(threadId: _threadId, runId: _runId),
+  const TextMessageStartEvent(messageId: 'msg-2'),
+  const TextMessageContentEvent(messageId: 'msg-2', delta: 'Sunny'),
+  const TextMessageEndEvent(messageId: 'msg-2'),
+  const RunFinishedEvent(threadId: _threadId, runId: _runId),
+];
 
 ToolRegistry _weatherRegistry() {
   return const ToolRegistry().register(
@@ -233,9 +233,7 @@ void main() {
       };
       when(
         () => api.createThread(any()),
-      ).thenAnswer(
-        (_) async => (_threadInfo(), initialState),
-      );
+      ).thenAnswer((_) async => (_threadInfo(), initialState));
       stubCreateRun();
       stubDeleteThread();
 
@@ -252,10 +250,7 @@ void main() {
         return Stream.fromIterable(_happyPathEvents());
       });
 
-      final session = await runtime.spawn(
-        roomId: _roomId,
-        prompt: 'Hello',
-      );
+      final session = await runtime.spawn(roomId: _roomId, prompt: 'Hello');
       await session.result;
 
       expect(capturedInput, isNotNull);
@@ -327,9 +322,7 @@ void main() {
       };
       when(
         () => api.createThread(any()),
-      ).thenAnswer(
-        (_) async => (_threadInfo(), serverState),
-      );
+      ).thenAnswer((_) async => (_threadInfo(), serverState));
       stubCreateRun();
       stubDeleteThread();
 
@@ -350,9 +343,7 @@ void main() {
         roomId: _roomId,
         prompt: 'Hello',
         stateOverlay: {
-          'rag': <String, dynamic>{
-            'document_filter': "id = 'abc-123'",
-          },
+          'rag': <String, dynamic>{'document_filter': "id = 'abc-123'"},
         },
       );
       await session.result;
@@ -951,18 +942,10 @@ void main() {
 
       // Deliver partial events then error
       controller1
-        ..add(
-          const RunStartedEvent(
-            threadId: 'thread-fail',
-            runId: _runId,
-          ),
-        )
+        ..add(const RunStartedEvent(threadId: 'thread-fail', runId: _runId))
         ..add(const TextMessageStartEvent(messageId: 'msg-1'))
         ..add(
-          const TextMessageContentEvent(
-            messageId: 'msg-1',
-            delta: 'Partial',
-          ),
+          const TextMessageContentEvent(messageId: 'msg-1', delta: 'Partial'),
         )
         ..add(const TextMessageEndEvent(messageId: 'msg-1'))
         ..addError(Exception('network lost'));
@@ -983,14 +966,8 @@ void main() {
         capturedInput =
             invocation.positionalArguments[1] as SimpleRunAgentInput;
         return Stream.fromIterable([
-          const RunStartedEvent(
-            threadId: 'thread-fail',
-            runId: 'run-2',
-          ),
-          const RunFinishedEvent(
-            threadId: 'thread-fail',
-            runId: 'run-2',
-          ),
+          const RunStartedEvent(threadId: 'thread-fail', runId: 'run-2'),
+          const RunFinishedEvent(threadId: 'thread-fail', runId: 'run-2'),
         ]);
       });
 
@@ -1350,11 +1327,7 @@ void main() {
       expect(messages.length, greaterThanOrEqualTo(3));
       expect(
         messages.last,
-        isA<UserMessage>().having(
-          (m) => m.content,
-          'content',
-          'Follow up',
-        ),
+        isA<UserMessage>().having((m) => m.content, 'content', 'Follow up'),
       );
     });
 

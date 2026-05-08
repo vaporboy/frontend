@@ -37,7 +37,9 @@ void main() {
       expect(expansions.forMessage('room-1', 'msg').timelineExpanded, isTrue);
       expect(expansions.forMessage('room-2', 'msg').timelineExpanded, isFalse);
       expect(
-          expansions.forMessage('room-1', 'other').timelineExpanded, isFalse);
+        expansions.forMessage('room-1', 'other').timelineExpanded,
+        isFalse,
+      );
     });
 
     test('the three state kinds do not cross-contaminate', () {

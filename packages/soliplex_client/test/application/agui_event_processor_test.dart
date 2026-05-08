@@ -692,8 +692,7 @@ void main() {
       });
 
       group('ToolCallActivity equality', () {
-        test(
-            'consecutive starts of same tool produce unequal activities '
+        test('consecutive starts of same tool produce unequal activities '
             '(different toolCallId)', () {
           const event1 = ToolCallStartEvent(
             toolCallId: 'tc-1',
@@ -726,8 +725,9 @@ void main() {
 
           final result = processEvent(conversation, streaming, event);
 
-          final activity = (result.streaming as app_streaming.AwaitingText)
-              .currentActivity as app_streaming.ToolCallActivity;
+          final activity =
+              (result.streaming as app_streaming.AwaitingText).currentActivity
+                  as app_streaming.ToolCallActivity;
           expect(activity.latestToolCallId, equals('tc-1'));
         });
 
@@ -740,8 +740,9 @@ void main() {
 
           final result = processEvent(conversation, streaming, event);
 
-          final activity = (result.streaming as app_streaming.AwaitingText)
-              .currentActivity as app_streaming.ToolCallActivity;
+          final activity =
+              (result.streaming as app_streaming.AwaitingText).currentActivity
+                  as app_streaming.ToolCallActivity;
           expect(activity.timestamp, equals(1000));
         });
       });
@@ -935,8 +936,9 @@ void main() {
           final result = processEvent(conversation, streaming, event);
           final after = DateTime.now().millisecondsSinceEpoch;
 
-          final activity = (result.streaming as app_streaming.AwaitingText)
-              .currentActivity as app_streaming.ToolCallActivity;
+          final activity =
+              (result.streaming as app_streaming.AwaitingText).currentActivity
+                  as app_streaming.ToolCallActivity;
           expect(activity.timestamp, greaterThanOrEqualTo(before));
           expect(activity.timestamp, lessThanOrEqualTo(after));
         },

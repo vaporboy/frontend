@@ -220,11 +220,7 @@ void main() {
       events.value = const ActivitySnapshot(
         messageId: 'rag:call_1',
         activityType: 'skill_tool_call',
-        content: {
-          'tool_name': 'ask',
-          'args': '{"q":"hi"}',
-          'status': 'done',
-        },
+        content: {'tool_name': 'ask', 'args': '{"q":"hi"}', 'status': 'done'},
         timestamp: 2,
       );
 
@@ -306,21 +302,18 @@ void main() {
       expect(tracker.skillToolCalls.value, isEmpty);
     });
 
-    test(
-      'missing timestamp is filled with wall-clock (non-zero) so the '
-      'decoded activity still appears',
-      () {
-        events.value = const ActivitySnapshot(
-          messageId: 'rag:call_1',
-          activityType: 'skill_tool_call',
-          content: {'tool_name': 'ask', 'args': '{}'},
-        );
+    test('missing timestamp is filled with wall-clock (non-zero) so the '
+        'decoded activity still appears', () {
+      events.value = const ActivitySnapshot(
+        messageId: 'rag:call_1',
+        activityType: 'skill_tool_call',
+        content: {'tool_name': 'ask', 'args': '{}'},
+      );
 
-        final calls = tracker.skillToolCalls.value;
-        expect(calls, hasLength(1));
-        expect(calls.single.timestamp, greaterThan(0));
-      },
-    );
+      final calls = tracker.skillToolCalls.value;
+      expect(calls, hasLength(1));
+      expect(calls.single.timestamp, greaterThan(0));
+    });
   });
 
   group('timeline', () {
@@ -369,27 +362,29 @@ void main() {
       expect(tracker.timeline.value.single, isA<TimelineOrphanActivity>());
     });
 
-    test('activity after a completed step with no new active step is orphan',
-        () {
-      events.value = const ClientToolExecuting(
-        toolName: 'execute_skill',
-        toolCallId: 'tc-1',
-      );
-      events.value = const ClientToolCompleted(
-        toolCallId: 'tc-1',
-        result: 'ok',
-        status: ToolCallStatus.completed,
-      );
-      events.value = const ActivitySnapshot(
-        messageId: 'bwrap:call_1',
-        activityType: 'skill_tool_call',
-        content: {'tool_name': 'execute_script', 'args': '{}'},
-        timestamp: 100,
-      );
+    test(
+      'activity after a completed step with no new active step is orphan',
+      () {
+        events.value = const ClientToolExecuting(
+          toolName: 'execute_skill',
+          toolCallId: 'tc-1',
+        );
+        events.value = const ClientToolCompleted(
+          toolCallId: 'tc-1',
+          result: 'ok',
+          status: ToolCallStatus.completed,
+        );
+        events.value = const ActivitySnapshot(
+          messageId: 'bwrap:call_1',
+          activityType: 'skill_tool_call',
+          content: {'tool_name': 'execute_script', 'args': '{}'},
+          timestamp: 100,
+        );
 
-      expect(tracker.timeline.value, hasLength(2));
-      expect(tracker.timeline.value.last, isA<TimelineOrphanActivity>());
-    });
+        expect(tracker.timeline.value, hasLength(2));
+        expect(tracker.timeline.value.last, isA<TimelineOrphanActivity>());
+      },
+    );
 
     test('multiple steps each get their own activities', () {
       events.value = const ClientToolExecuting(

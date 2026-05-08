@@ -22,9 +22,7 @@ ModuleContribution roomModule({
   final uploadRegistry = UploadTrackerRegistry(servers: serverManager.servers);
   final messageExpansions = MessageExpansions();
   return ModuleContribution(
-    overrides: [
-      messageExpansionsProvider.overrideWithValue(messageExpansions),
-    ],
+    overrides: [messageExpansionsProvider.overrideWithValue(messageExpansions)],
     routes: [
       GoRoute(
         path: '/room/:serverAlias/:roomId/info',

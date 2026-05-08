@@ -550,8 +550,9 @@ void main() {
                 status: round == 0
                     ? ToolCallStatus.failed
                     : ToolCallStatus.completed,
-                result:
-                    round == 0 ? 'error: value must be greater than 100' : '42',
+                result: round == 0
+                    ? 'error: value must be greater than 100'
+                    : '42',
               ),
             )
             .toList();
@@ -602,14 +603,11 @@ void main() {
         prompt: 'Say exactly: GAMMA=300',
       );
 
-      final results = await runtime.waitAll(
-        [
-          s1,
-          s2,
-          s3,
-        ],
-        timeout: const Duration(seconds: 90),
-      );
+      final results = await runtime.waitAll([
+        s1,
+        s2,
+        s3,
+      ], timeout: const Duration(seconds: 90));
       expect(results, hasLength(3));
       expect(results.every((r) => r is AgentSuccess), isTrue);
 
@@ -660,14 +658,11 @@ void main() {
         prompt: 'Write a detailed 3 paragraph essay about quantum computing.',
       );
 
-      final winner = await runtime.waitAny(
-        [
-          fast,
-          medium,
-          slow,
-        ],
-        timeout: const Duration(seconds: 60),
-      );
+      final winner = await runtime.waitAny([
+        fast,
+        medium,
+        slow,
+      ], timeout: const Duration(seconds: 60));
       print('Winner type: ${winner.runtimeType}');
       expect(winner, isA<AgentSuccess>());
 
@@ -933,7 +928,8 @@ void main() {
       // Plan.
       final planner = await runtime.spawn(
         roomId: 'planner',
-        prompt: 'Describe a futuristic city in 3 aspects: '
+        prompt:
+            'Describe a futuristic city in 3 aspects: '
             'architecture, transportation, energy.',
       );
       final pr = await planner.awaitResult(
@@ -944,8 +940,7 @@ void main() {
       // Parse subtasks — handle LLM formatting quirks.
       var tasks = <String>[];
       try {
-        final raw = (pr as AgentSuccess)
-            .output
+        final raw = (pr as AgentSuccess).output
             .replaceAll(RegExp(r'^```json\s*|\s*```$'), '')
             .trim();
         tasks = List<String>.from(jsonDecode(raw) as List);
@@ -971,8 +966,9 @@ void main() {
       );
       expect(results.every((r) => r is AgentSuccess), isTrue);
 
-      final workerOutputs =
-          results.map((r) => (r as AgentSuccess).output).toList();
+      final workerOutputs = results
+          .map((r) => (r as AgentSuccess).output)
+          .toList();
       print('Worker outputs: $workerOutputs');
 
       // Synthesize.
@@ -1015,10 +1011,11 @@ void main() {
         prompt: 'Is Pluto a planet? Answer YES or NO with one sentence.',
       );
 
-      final results = await runtime.waitAll(
-        [s1, s2, s3],
-        timeout: const Duration(seconds: 90),
-      );
+      final results = await runtime.waitAll([
+        s1,
+        s2,
+        s3,
+      ], timeout: const Duration(seconds: 90));
       expect(results.every((r) => r is AgentSuccess), isTrue);
 
       final opinions = results.map((r) => (r as AgentSuccess).output).toList();
@@ -1027,7 +1024,8 @@ void main() {
       // Judge.
       final judge = await runtime.spawn(
         roomId: 'judge',
-        prompt: 'Three experts were asked "Is Pluto a planet?"\n'
+        prompt:
+            'Three experts were asked "Is Pluto a planet?"\n'
             '1: ${opinions[0]}\n'
             '2: ${opinions[1]}\n'
             '3: ${opinions[2]}\n'
@@ -1076,9 +1074,9 @@ void main() {
       );
       expect(cr, isA<AgentSuccess>());
       final route = (cr as AgentSuccess).output.trim().toLowerCase().replaceAll(
-            RegExp('[^a-z]'),
-            '',
-          );
+        RegExp('[^a-z]'),
+        '',
+      );
       print('Classifier route: $route');
 
       // Keep winner, cancel loser.
@@ -1131,7 +1129,8 @@ void main() {
         // Review.
         final reviewer = await runtime.spawn(
           roomId: 'reviewer',
-          prompt: 'Does this have exactly 3 bullet points? '
+          prompt:
+              'Does this have exactly 3 bullet points? '
               'Reply PASS or FAIL: <reason>.\n\n$draft',
         );
         final rr = await reviewer.awaitResult(
@@ -1149,7 +1148,8 @@ void main() {
         // Fix.
         final fixer = await runtime.spawn(
           roomId: 'fixer',
-          prompt: 'Draft: $draft\nFeedback: $review\n'
+          prompt:
+              'Draft: $draft\nFeedback: $review\n'
               'Produce exactly 3 bullet points about Dart.',
         );
         final fr = await fixer.awaitResult(
@@ -1204,7 +1204,8 @@ void main() {
       // Rebuttal.
       final reb = await runtime.spawn(
         roomId: 'advocate',
-        prompt: 'A critic responded: $againstArgs\n'
+        prompt:
+            'A critic responded: $againstArgs\n'
             'Defend your strongest point in 2 sentences.',
       );
       final rbr = await reb.awaitResult(timeout: const Duration(seconds: 60));
@@ -1215,7 +1216,8 @@ void main() {
       // Judge.
       final jdg = await runtime.spawn(
         roomId: 'judge',
-        prompt: 'Debate: "Is remote work better than office work?"\n'
+        prompt:
+            'Debate: "Is remote work better than office work?"\n'
             'FOR: $rebuttal\n'
             'AGAINST: $againstArgs\n'
             'Who made the stronger argument? '
@@ -1264,7 +1266,8 @@ void main() {
         mappers.add(
           await runtime.spawn(
             roomId: 'parallel',
-            prompt: 'Extract only the population number from: $chunk. '
+            prompt:
+                'Extract only the population number from: $chunk. '
                 'Reply with just the number.',
           ),
         );
@@ -1277,14 +1280,16 @@ void main() {
       expect(mapResults, hasLength(5));
       expect(mapResults.every((r) => r is AgentSuccess), isTrue);
 
-      final populations =
-          mapResults.map((r) => (r as AgentSuccess).output.trim()).toList();
+      final populations = mapResults
+          .map((r) => (r as AgentSuccess).output.trim())
+          .toList();
       print('Mapped populations: $populations');
 
       // Reduce.
       final reducer = await runtime.spawn(
         roomId: 'echo',
-        prompt: 'Given populations: ${populations.join(", ")} — '
+        prompt:
+            'Given populations: ${populations.join(", ")} — '
             'which country has the largest and smallest population? '
             'The data was: ${chunks.join("; ")}',
       );

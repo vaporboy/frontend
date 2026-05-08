@@ -14,19 +14,19 @@ import '../../helpers/fakes.dart';
 class _FakeAuthSession extends Fake implements AuthSession {}
 
 ServerConnection _fakeConnection(FakeSoliplexApi api) => ServerConnection(
-      serverId: 'test-server',
-      api: api,
-      agUiStreamClient: FakeAgUiStreamClient(),
-    );
+  serverId: 'test-server',
+  api: api,
+  agUiStreamClient: FakeAgUiStreamClient(),
+);
 
 ServerEntry _fakeServerEntry(ServerConnection connection) => ServerEntry(
-      serverId: connection.serverId,
-      alias: connection.serverId,
-      serverUrl: Uri.parse('https://${connection.serverId}.example.com'),
-      auth: _FakeAuthSession(),
-      httpClient: FakeHttpClient(),
-      connection: connection,
-    );
+  serverId: connection.serverId,
+  alias: connection.serverId,
+  serverUrl: Uri.parse('https://${connection.serverId}.example.com'),
+  auth: _FakeAuthSession(),
+  httpClient: FakeHttpClient(),
+  connection: connection,
+);
 
 void main() {
   late FakeSoliplexApi api;
@@ -276,8 +276,11 @@ void main() {
   });
 
   test('fetches room metadata on construction', () async {
-    api.nextRoom =
-        Room(id: 'room-1', name: 'Test Room', welcomeMessage: 'Hello!');
+    api.nextRoom = Room(
+      id: 'room-1',
+      name: 'Test Room',
+      welcomeMessage: 'Hello!',
+    );
     api.nextThreads = [];
 
     final state = RoomState(
@@ -468,10 +471,7 @@ void main() {
       final viewBefore = state.activeThreadView;
 
       api.nextDeleteThreadError = Exception('server error');
-      expect(
-        () => state.deleteThread('thread-1'),
-        throwsA(isA<Exception>()),
-      );
+      expect(() => state.deleteThread('thread-1'), throwsA(isA<Exception>()));
 
       // Active view must be preserved on failure.
       expect(state.activeThreadView, same(viewBefore));

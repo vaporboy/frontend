@@ -152,10 +152,10 @@ class RecordingAuthFlow implements AuthFlow {
 /// All other methods throw [UnimplementedError].
 class FakeSoliplexApi extends SoliplexApi {
   FakeSoliplexApi()
-      : super(
-          transport: HttpTransport(client: FakeHttpClient()),
-          urlBuilder: UrlBuilder('https://fake.example.com/api/v1'),
-        );
+    : super(
+        transport: HttpTransport(client: FakeHttpClient()),
+        urlBuilder: UrlBuilder('https://fake.example.com/api/v1'),
+      );
 
   List<Room>? nextRooms;
   Room? nextRoom;
@@ -188,7 +188,8 @@ class FakeSoliplexApi extends SoliplexApi {
     if (nextError != null) throw nextError!;
     if (nextRooms != null) return nextRooms!;
     throw StateError(
-        'FakeSoliplexApi: set nextRooms or nextError before calling');
+      'FakeSoliplexApi: set nextRooms or nextError before calling',
+    );
   }
 
   @override
@@ -196,7 +197,8 @@ class FakeSoliplexApi extends SoliplexApi {
     if (nextError != null) throw nextError!;
     if (nextRoom != null) return nextRoom!;
     throw StateError(
-        'FakeSoliplexApi: set nextRoom or nextError before calling');
+      'FakeSoliplexApi: set nextRoom or nextError before calling',
+    );
   }
 
   @override
@@ -218,7 +220,8 @@ class FakeSoliplexApi extends SoliplexApi {
     if (nextThreadHistoryError != null) throw nextThreadHistoryError!;
     if (nextThreadHistory != null) return nextThreadHistory!;
     throw StateError(
-        'FakeSoliplexApi: set nextThreadHistory or nextThreadHistoryError');
+      'FakeSoliplexApi: set nextThreadHistory or nextThreadHistoryError',
+    );
   }
 
   @override
@@ -350,10 +353,10 @@ class FakeSoliplexApi extends SoliplexApi {
 /// exercise streaming.
 class FakeAgUiStreamClient extends AgUiStreamClient {
   FakeAgUiStreamClient()
-      : super(
-          httpTransport: HttpTransport(client: FakeHttpClient()),
-          urlBuilder: UrlBuilder('https://fake.example.com/api/v1'),
-        );
+    : super(
+        httpTransport: HttpTransport(client: FakeHttpClient()),
+        urlBuilder: UrlBuilder('https://fake.example.com/api/v1'),
+      );
 }
 
 /// Logger for tests. Uses soliplex_logging's LogManager.

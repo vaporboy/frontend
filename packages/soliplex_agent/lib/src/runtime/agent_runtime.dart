@@ -56,18 +56,19 @@ class AgentRuntime {
     AgentUiDelegate? uiDelegate,
     this.maxSpawnDepth = 10,
     this.rootTimeout,
-  })  : serverId = connection.serverId,
-        _connection = connection,
-        _llmProvider = llmProvider ??
-            AgUiLlmProvider(
-              api: connection.api,
-              agUiStreamClient: connection.agUiStreamClient,
-            ),
-        _toolRegistryResolver = toolRegistryResolver,
-        _extensionFactory = extensionFactory,
-        _uiDelegate = uiDelegate,
-        _platform = platform,
-        _logger = logger;
+  }) : serverId = connection.serverId,
+       _connection = connection,
+       _llmProvider =
+           llmProvider ??
+           AgUiLlmProvider(
+             api: connection.api,
+             agUiStreamClient: connection.agUiStreamClient,
+           ),
+       _toolRegistryResolver = toolRegistryResolver,
+       _extensionFactory = extensionFactory,
+       _uiDelegate = uiDelegate,
+       _platform = platform,
+       _logger = logger;
 
   final ServerConnection _connection;
   final AgentLlmProvider _llmProvider;
@@ -126,10 +127,7 @@ class AgentRuntime {
   /// Call this when a thread is created outside of [spawn] (e.g. via
   /// a UI "new thread" button) so that the backend-provided initial
   /// state is available when [spawn] is later called with that threadId.
-  void seedThreadState(
-    String threadId,
-    Map<String, dynamic> aguiState,
-  ) {
+  void seedThreadState(String threadId, Map<String, dynamic> aguiState) {
     if (aguiState.isEmpty) return;
     _threadHistories[threadId] = ThreadHistory(
       messages: const [],
@@ -297,8 +295,9 @@ class AgentRuntime {
       final key = (serverId: serverId, roomId: roomId, threadId: threadId);
       return (key, null);
     }
-    final (threadInfo, initialAguiState) =
-        await _connection.api.createThread(roomId);
+    final (threadInfo, initialAguiState) = await _connection.api.createThread(
+      roomId,
+    );
     final key = (serverId: serverId, roomId: roomId, threadId: threadInfo.id);
     if (initialAguiState.isNotEmpty) {
       _threadHistories[key.threadId] = ThreadHistory(
@@ -306,8 +305,9 @@ class AgentRuntime {
         aguiState: initialAguiState,
       );
     }
-    final existingRunId =
-        threadInfo.hasInitialRun ? threadInfo.initialRunId : null;
+    final existingRunId = threadInfo.hasInitialRun
+        ? threadInfo.initialRunId
+        : null;
     return (key, existingRunId);
   }
 
@@ -429,10 +429,10 @@ class AgentRuntime {
     final state = session.runState.value;
     final history = switch (state) {
       CompletedState(:final conversation) => ThreadHistory(
-          messages: conversation.messages,
-          aguiState: conversation.aguiState,
-          messageStates: conversation.messageStates,
-        ),
+        messages: conversation.messages,
+        aguiState: conversation.aguiState,
+        messageStates: conversation.messageStates,
+      ),
       CancelledState(:final conversation) when conversation != null =>
         ThreadHistory(
           messages: conversation.messages,

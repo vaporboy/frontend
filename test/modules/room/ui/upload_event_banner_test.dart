@@ -31,10 +31,7 @@ void main() {
     // Defaults: empty server lists, uploads succeed. Individual tests
     // override as needed.
     when(
-      () => api.getRoomUploads(
-        any(),
-        cancelToken: any(named: 'cancelToken'),
-      ),
+      () => api.getRoomUploads(any(), cancelToken: any(named: 'cancelToken')),
     ).thenAnswer((_) async => const <FileUpload>[]);
     when(
       () => api.getThreadUploads(
@@ -195,8 +192,9 @@ void main() {
     expect(find.textContaining('Failed to upload b.pdf'), findsOneWidget);
   });
 
-  testWidgets('X dismisses success and failure pills independently',
-      (tester) async {
+  testWidgets('X dismisses success and failure pills independently', (
+    tester,
+  ) async {
     // First upload succeeds, second fails.
     var uploadCallCount = 0;
     when(
@@ -269,8 +267,9 @@ void main() {
     expect(find.textContaining('Failed to upload bad.pdf'), findsNothing);
   });
 
-  testWidgets('scope switch does not fire pill for pre-existing failed',
-      (tester) async {
+  testWidgets('scope switch does not fire pill for pre-existing failed', (
+    tester,
+  ) async {
     when(
       () => api.uploadFileToThread(
         any(),
@@ -312,8 +311,9 @@ void main() {
     expect(find.textContaining('Uploaded'), findsNothing);
   });
 
-  testWidgets('scope switch mid-success drops the pending timer',
-      (tester) async {
+  testWidgets('scope switch mid-success drops the pending timer', (
+    tester,
+  ) async {
     await tester.pumpWidget(frame('room-1', 'thread-A'));
     unawaited(tracker.refreshThread('room-1', 'thread-A'));
     await tester.pump();
@@ -388,8 +388,9 @@ void main() {
     expect(find.textContaining('and 1 more'), findsOneWidget);
   });
 
-  testWidgets('both pills render when a failure and a success coexist',
-      (tester) async {
+  testWidgets('both pills render when a failure and a success coexist', (
+    tester,
+  ) async {
     var uploadCallCount = 0;
     when(
       () => api.uploadFileToThread(

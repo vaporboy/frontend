@@ -30,30 +30,32 @@ void main() {
       expect(trackers['msg-1']!.isFrozen, isTrue);
     });
 
-    test('thinking events before TEXT_MESSAGE_START attach to that message',
-        () {
-      final runs = [
-        RunEventBundle(
-          runId: 'run-1',
-          events: const [
-            ReasoningMessageStartEvent(messageId: 'reason-1'),
-            ReasoningMessageContentEvent(
-              messageId: 'reason-1',
-              delta: 'thinking...',
-            ),
-            TextMessageStartEvent(messageId: 'msg-1'),
-            TextMessageEndEvent(messageId: 'msg-1'),
-          ],
-        ),
-      ];
+    test(
+      'thinking events before TEXT_MESSAGE_START attach to that message',
+      () {
+        final runs = [
+          RunEventBundle(
+            runId: 'run-1',
+            events: const [
+              ReasoningMessageStartEvent(messageId: 'reason-1'),
+              ReasoningMessageContentEvent(
+                messageId: 'reason-1',
+                delta: 'thinking...',
+              ),
+              TextMessageStartEvent(messageId: 'msg-1'),
+              TextMessageEndEvent(messageId: 'msg-1'),
+            ],
+          ),
+        ];
 
-      final trackers = replayToTrackers(runs);
-      final tracker = trackers['msg-1']!;
+        final trackers = replayToTrackers(runs);
+        final tracker = trackers['msg-1']!;
 
-      expect(tracker.steps.value, hasLength(1));
-      expect(tracker.steps.value.first.label, 'Thinking');
-      expect(tracker.thinkingBlocks.value, ['thinking...']);
-    });
+        expect(tracker.steps.value, hasLength(1));
+        expect(tracker.steps.value.first.label, 'Thinking');
+        expect(tracker.thinkingBlocks.value, ['thinking...']);
+      },
+    );
 
     test('tool calls between two assistant messages attach to the first', () {
       final runs = [
@@ -62,10 +64,7 @@ void main() {
           events: const [
             TextMessageStartEvent(messageId: 'msg-1'),
             TextMessageEndEvent(messageId: 'msg-1'),
-            ToolCallStartEvent(
-              toolCallId: 'tc-1',
-              toolCallName: 'search',
-            ),
+            ToolCallStartEvent(toolCallId: 'tc-1', toolCallName: 'search'),
             ToolCallResultEvent(
               messageId: 'result-1',
               toolCallId: 'tc-1',
@@ -132,7 +131,9 @@ void main() {
           runId: 'run-1',
           events: const [
             TextMessageStartEvent(
-                messageId: 'user-1', role: TextMessageRole.user),
+              messageId: 'user-1',
+              role: TextMessageRole.user,
+            ),
             TextMessageEndEvent(messageId: 'user-1'),
           ],
         ),

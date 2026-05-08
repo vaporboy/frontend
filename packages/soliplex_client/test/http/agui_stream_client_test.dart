@@ -229,11 +229,7 @@ void main() {
           ..writeln('data: ')
           ..writeln()
           ..writeln(
-            'data: ${json.encode({
-                  'type': 'RUN_STARTED',
-                  'threadId': 't-1',
-                  'runId': 'r-1',
-                })}',
+            'data: ${json.encode({'type': 'RUN_STARTED', 'threadId': 't-1', 'runId': 'r-1'})}',
           )
           ..writeln();
 
@@ -367,11 +363,7 @@ void main() {
           ..writeln('data: not valid json at all')
           ..writeln()
           ..writeln(
-            'data: ${json.encode({
-                  'type': 'RUN_STARTED',
-                  'threadId': 't-1',
-                  'runId': 'r-1',
-                })}',
+            'data: ${json.encode({'type': 'RUN_STARTED', 'threadId': 't-1', 'runId': 'r-1'})}',
           )
           ..writeln();
 
@@ -426,8 +418,9 @@ void main() {
           ),
         );
 
-        final result =
-            await clientWithWarning.runAgent(endpoint, input).toList();
+        final result = await clientWithWarning
+            .runAgent(endpoint, input)
+            .toList();
 
         expect(result, hasLength(2));
         expect(warnings, hasLength(1));

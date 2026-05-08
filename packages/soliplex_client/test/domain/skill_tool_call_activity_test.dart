@@ -157,20 +157,14 @@ void main() {
       const a = SkillToolCallActivity(
         messageId: 'm1',
         toolName: 'ask',
-        args: {
-          'q': 'hi',
-          'top_k': 3,
-        },
+        args: {'q': 'hi', 'top_k': 3},
         status: 'done',
         timestamp: 1,
       );
       const b = SkillToolCallActivity(
         messageId: 'm1',
         toolName: 'ask',
-        args: {
-          'q': 'hi',
-          'top_k': 3,
-        },
+        args: {'q': 'hi', 'top_k': 3},
         status: 'done',
         timestamp: 1,
       );

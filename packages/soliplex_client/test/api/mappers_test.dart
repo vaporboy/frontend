@@ -1933,10 +1933,7 @@ void main() {
 
       test('throws FormatException when url is not a valid URI', () {
         expect(
-          () => fileUploadFromJson({
-            'filename': 'a.pdf',
-            'url': 'http://[::1',
-          }),
+          () => fileUploadFromJson({'filename': 'a.pdf', 'url': 'http://[::1'}),
           throwsFormatException,
         );
       });

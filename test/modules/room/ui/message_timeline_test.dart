@@ -16,20 +16,22 @@ void main() {
       text: 'Hello',
     );
 
-    await tester.pumpWidget(ProviderScope(
-      overrides: [
-        messageExpansionsProvider.overrideWithValue(MessageExpansions()),
-      ],
-      child: MaterialApp(
-        home: Scaffold(
-          body: MessageTimeline(
-            roomId: 'r',
-            messages: [message],
-            messageStates: const {},
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          messageExpansionsProvider.overrideWithValue(MessageExpansions()),
+        ],
+        child: MaterialApp(
+          home: Scaffold(
+            body: MessageTimeline(
+              roomId: 'r',
+              messages: [message],
+              messageStates: const {},
+            ),
           ),
         ),
       ),
-    ));
+    );
 
     expect(find.text('Hello'), findsOneWidget);
   });

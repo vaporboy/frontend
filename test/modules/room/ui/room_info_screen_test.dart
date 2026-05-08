@@ -31,9 +31,7 @@ const _testRoom = Room(
       kind: 'bare',
     ),
   },
-  mcpClientToolsets: {
-    'stdio-tools': McpClientToolset(kind: 'stdio'),
-  },
+  mcpClientToolsets: {'stdio-tools': McpClientToolset(kind: 'stdio')},
 );
 
 Widget _buildScreen({
@@ -61,11 +59,8 @@ Widget _buildScreen({
 /// Build variant that hands back the [ServerEntry] and
 /// [UploadTrackerRegistry] so tests can interact with the tracker
 /// (e.g., pre-populate it before the screen mounts).
-({
-  Widget widget,
-  ServerEntry entry,
-  UploadTrackerRegistry uploadRegistry,
-}) _buildScreenWithRegistry({
+({Widget widget, ServerEntry entry, UploadTrackerRegistry uploadRegistry})
+_buildScreenWithRegistry({
   Room? room,
   FakeSoliplexApi? api,
   Future<ToolRegistry> Function(String)? toolRegistryResolver,
@@ -169,8 +164,9 @@ void main() {
       expect(find.text('SKILLS (1)'), findsOneWidget);
     });
 
-    testWidgets('expanding skill shows detail dialog on Show more',
-        (tester) async {
+    testWidgets('expanding skill shows detail dialog on Show more', (
+      tester,
+    ) async {
       final room = _testRoom.copyWith(
         skills: {
           'web_search': const RoomSkill(
@@ -247,9 +243,7 @@ void main() {
     testWidgets('shows client tools loading then empty', (tester) async {
       final completer = Completer<ToolRegistry>();
       await tester.pumpWidget(
-        _buildScreen(
-          toolRegistryResolver: (_) => completer.future,
-        ),
+        _buildScreen(toolRegistryResolver: (_) => completer.future),
       );
       // Use pump() — pumpAndSettle would time out on the loading spinner.
       await tester.pump();
@@ -344,8 +338,9 @@ void main() {
   });
 
   group('uploaded files refresh dedupe', () {
-    testWidgets('fetches uploads when the tracker is still Loading',
-        (tester) async {
+    testWidgets('fetches uploads when the tracker is still Loading', (
+      tester,
+    ) async {
       final api = FakeSoliplexApi()..nextRoomUploads = const [];
       await tester.pumpWidget(_buildScreen(api: api));
       await tester.pumpAndSettle();
@@ -353,8 +348,9 @@ void main() {
       expect(api.getRoomUploadsCount, 1);
     });
 
-    testWidgets('skips the fetch when the tracker already has a Loaded list',
-        (tester) async {
+    testWidgets('skips the fetch when the tracker already has a Loaded list', (
+      tester,
+    ) async {
       final api = FakeSoliplexApi()..nextRoomUploads = const [];
       final built = _buildScreenWithRegistry(api: api);
 

@@ -8,10 +8,7 @@ import 'package:meta/meta.dart';
 @immutable
 class FileUpload {
   /// Creates a file upload entry.
-  const FileUpload({
-    required this.filename,
-    required this.url,
-  });
+  const FileUpload({required this.filename, required this.url});
 
   /// User-visible filename as stored by the backend.
   final String filename;

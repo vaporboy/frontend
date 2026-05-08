@@ -35,16 +35,18 @@ class RoomState {
     required RunRegistry registry,
     required UploadTrackerRegistry uploadRegistry,
     this.onNavigateToThread,
-  })  : _connection = serverEntry.connection,
-        _roomId = roomId,
-        _runtimeManager = runtimeManager,
-        _registry = registry,
-        threadList = ThreadListState(
-          connection: serverEntry.connection,
-          roomId: roomId,
-        ),
-        uploadTracker =
-            uploadRegistry.trackerFor(entry: serverEntry, roomId: roomId) {
+  }) : _connection = serverEntry.connection,
+       _roomId = roomId,
+       _runtimeManager = runtimeManager,
+       _registry = registry,
+       threadList = ThreadListState(
+         connection: serverEntry.connection,
+         roomId: roomId,
+       ),
+       uploadTracker = uploadRegistry.trackerFor(
+         entry: serverEntry,
+         roomId: roomId,
+       ) {
     _fetchRoom();
     // Every room entry forces a refresh so the list reflects server
     // state from other devices and self-heals any pending record that
@@ -73,8 +75,9 @@ class RoomState {
   // Lifecycle: null → spawning (sendToNewThread) → null (on completion,
   //            error, or cancelSpawn). Doubles as a concurrency guard and
   //            the UI signal for ChatInput's cancel button.
-  final Signal<AgentSessionState?> _sessionState =
-      Signal<AgentSessionState?>(null);
+  final Signal<AgentSessionState?> _sessionState = Signal<AgentSessionState?>(
+    null,
+  );
   ReadonlySignal<AgentSessionState?> get sessionState => _sessionState;
 
   final Signal<SendError?> _lastError = Signal<SendError?>(null);
@@ -85,15 +88,18 @@ class RoomState {
   void _fetchRoom() {
     final token = CancelToken();
     _roomFetchToken = token;
-    _connection.api.getRoom(_roomId, cancelToken: token).then((room) {
-      if (token.isCancelled) return;
-      _roomFetchToken = null;
-      _room.value = RoomLoaded(room);
-    }).catchError((Object error) {
-      if (token.isCancelled) return;
-      _roomFetchToken = null;
-      _room.value = RoomFailed(error);
-    });
+    _connection.api
+        .getRoom(_roomId, cancelToken: token)
+        .then((room) {
+          if (token.isCancelled) return;
+          _roomFetchToken = null;
+          _room.value = RoomLoaded(room);
+        })
+        .catchError((Object error) {
+          if (token.isCancelled) return;
+          _roomFetchToken = null;
+          _room.value = RoomFailed(error);
+        });
   }
 
   ThreadViewState? get activeThreadView => _activeThreadView;
@@ -176,18 +182,22 @@ class RoomState {
     if (pending == null) return;
     _pendingSpawn = null;
     _sessionState.value = null;
-    unawaited(pending.then((s) {
-      s.cancel();
-      s.dispose();
-    }).catchError((Object e, StackTrace st) {
-      dev.log(
-        'Cancelled spawn cleanup failed',
-        error: e,
-        stackTrace: st,
-        name: 'RoomState',
-        level: 1000,
-      );
-    }));
+    unawaited(
+      pending
+          .then((s) {
+            s.cancel();
+            s.dispose();
+          })
+          .catchError((Object e, StackTrace st) {
+            dev.log(
+              'Cancelled spawn cleanup failed',
+              error: e,
+              stackTrace: st,
+              name: 'RoomState',
+              level: 1000,
+            );
+          }),
+    );
   }
 
   Future<void> sendToNewThread(
@@ -217,11 +227,13 @@ class RoomState {
       // generates the thread's name lazily after the run finishes; the
       // sidebar picks that up on the next natural refresh (room change,
       // pull-to-refresh, re-entry).
-      threadList.noteSpawnedThread(ThreadInfo(
-        id: key.threadId,
-        roomId: _roomId,
-        createdAt: DateTime.now(),
-      ));
+      threadList.noteSpawnedThread(
+        ThreadInfo(
+          id: key.threadId,
+          roomId: _roomId,
+          createdAt: DateTime.now(),
+        ),
+      );
       selectThread(key.threadId);
       _activeThreadView!.attachSession(session);
       onNavigateToThread?.call(key.threadId);

@@ -137,9 +137,7 @@ void main() {
 
   group('RunEventBundle', () {
     test('is immutable - events list cannot be modified externally', () {
-      final events = <BaseEvent>[
-        const TextMessageStartEvent(messageId: 'm1'),
-      ];
+      final events = <BaseEvent>[const TextMessageStartEvent(messageId: 'm1')];
       final bundle = RunEventBundle(runId: 'run-1', events: events);
 
       events.add(const TextMessageEndEvent(messageId: 'm1'));

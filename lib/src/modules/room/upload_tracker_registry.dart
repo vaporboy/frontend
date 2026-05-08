@@ -65,8 +65,9 @@ class UploadTrackerRegistry {
   void _evictRemoved(Map<String, ServerEntry> snapshot) {
     if (_isDisposed) return;
     final liveIds = snapshot.keys.toSet();
-    final dead =
-        _trackers.entries.where((e) => !liveIds.contains(e.key.$1)).toList();
+    final dead = _trackers.entries
+        .where((e) => !liveIds.contains(e.key.$1))
+        .toList();
     for (final entry in dead) {
       entry.value.dispose();
       _trackers.remove(entry.key);

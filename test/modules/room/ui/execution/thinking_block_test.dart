@@ -30,24 +30,22 @@ void main() {
     });
 
     Widget wrap(Widget child) => ProviderScope(
-          overrides: [
-            messageExpansionsProvider.overrideWithValue(store),
-          ],
-          child: MaterialApp(home: Scaffold(body: child)),
-        );
+      overrides: [messageExpansionsProvider.overrideWithValue(store)],
+      child: MaterialApp(home: Scaffold(body: child)),
+    );
 
     ExecutionThinkingBlock build({
       String roomId = _roomId,
       String messageId = _messageId,
-    }) =>
-        ExecutionThinkingBlock(
-          roomId: roomId,
-          messageId: messageId,
-          tracker: tracker,
-        );
+    }) => ExecutionThinkingBlock(
+      roomId: roomId,
+      messageId: messageId,
+      tracker: tracker,
+    );
 
-    testWidgets('returns empty when no blocks and not streaming',
-        (tester) async {
+    testWidgets('returns empty when no blocks and not streaming', (
+      tester,
+    ) async {
       await tester.pumpWidget(wrap(build()));
 
       expect(find.byType(SizedBox), findsWidgets);
@@ -65,8 +63,9 @@ void main() {
       expect(find.text('Thinking'), findsOneWidget);
     });
 
-    testWidgets('shows streaming indicator when isThinkingStreaming',
-        (tester) async {
+    testWidgets('shows streaming indicator when isThinkingStreaming', (
+      tester,
+    ) async {
       events.value = const ThinkingStarted();
 
       await tester.pumpWidget(wrap(build()));
@@ -75,8 +74,9 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
 
-    testWidgets('does not show streaming indicator when not streaming',
-        (tester) async {
+    testWidgets('does not show streaming indicator when not streaming', (
+      tester,
+    ) async {
       events.value = const ThinkingStarted();
       events.value = const ThinkingContent(delta: 'Some thoughts');
       events.value = const RunCompleted();
@@ -172,9 +172,8 @@ void main() {
       events.value = const ThinkingStarted();
       events.value = const ThinkingContent(delta: 'A deep thought');
 
-      Widget tree(Key parentKey) => wrap(
-            KeyedSubtree(key: parentKey, child: build()),
-          );
+      Widget tree(Key parentKey) =>
+          wrap(KeyedSubtree(key: parentKey, child: build()));
 
       await tester.pumpWidget(tree(const ValueKey('A')));
       await tester.pump();
@@ -191,9 +190,8 @@ void main() {
       events.value = const ThinkingStarted();
       events.value = const ThinkingContent(delta: 'A deep thought');
 
-      Widget tree(Key parentKey) => wrap(
-            KeyedSubtree(key: parentKey, child: build()),
-          );
+      Widget tree(Key parentKey) =>
+          wrap(KeyedSubtree(key: parentKey, child: build()));
 
       await tester.pumpWidget(tree(const ValueKey('A')));
       await tester.pump();

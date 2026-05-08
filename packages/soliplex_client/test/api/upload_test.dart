@@ -191,27 +191,29 @@ void main() {
       expect(await api.getRoomUploads('room-123'), isEmpty);
     });
 
-    test('throws UnexpectedException when uploads field is not a list',
-        () async {
-      when(
-        () => mockTransport.request<Map<String, dynamic>>(
-          'GET',
-          any(),
-          cancelToken: any(named: 'cancelToken'),
-          fromJson: any(named: 'fromJson'),
-          body: any(named: 'body'),
-          headers: any(named: 'headers'),
-          timeout: any(named: 'timeout'),
-        ),
-      ).thenAnswer(
-        (_) async => {'room_id': 'room-123', 'uploads': 'not-a-list'},
-      );
+    test(
+      'throws UnexpectedException when uploads field is not a list',
+      () async {
+        when(
+          () => mockTransport.request<Map<String, dynamic>>(
+            'GET',
+            any(),
+            cancelToken: any(named: 'cancelToken'),
+            fromJson: any(named: 'fromJson'),
+            body: any(named: 'body'),
+            headers: any(named: 'headers'),
+            timeout: any(named: 'timeout'),
+          ),
+        ).thenAnswer(
+          (_) async => {'room_id': 'room-123', 'uploads': 'not-a-list'},
+        );
 
-      await expectLater(
-        api.getRoomUploads('room-123'),
-        throwsA(isA<UnexpectedException>()),
-      );
-    });
+        await expectLater(
+          api.getRoomUploads('room-123'),
+          throwsA(isA<UnexpectedException>()),
+        );
+      },
+    );
 
     test('skips malformed entries and returns valid ones', () async {
       when(
@@ -231,10 +233,7 @@ void main() {
             {'filename': 'good.pdf', 'url': 'https://example.com/good'},
             {'filename': 'missing-url'},
             'not a map',
-            {
-              'filename': 'also-good.pdf',
-              'url': 'https://example.com/good2',
-            },
+            {'filename': 'also-good.pdf', 'url': 'https://example.com/good2'},
           ],
         },
       );
@@ -259,17 +258,19 @@ void main() {
 
       await api.getRoomUploads('room-abc');
 
-      final captured = verify(
-        () => mockTransport.request<Map<String, dynamic>>(
-          'GET',
-          captureAny(),
-          cancelToken: any(named: 'cancelToken'),
-          fromJson: any(named: 'fromJson'),
-          body: any(named: 'body'),
-          headers: any(named: 'headers'),
-          timeout: any(named: 'timeout'),
-        ),
-      ).captured.single as Uri;
+      final captured =
+          verify(
+                () => mockTransport.request<Map<String, dynamic>>(
+                  'GET',
+                  captureAny(),
+                  cancelToken: any(named: 'cancelToken'),
+                  fromJson: any(named: 'fromJson'),
+                  body: any(named: 'body'),
+                  headers: any(named: 'headers'),
+                  timeout: any(named: 'timeout'),
+                ),
+              ).captured.single
+              as Uri;
 
       expect(captured.path, endsWith('/uploads/room-abc'));
     });
@@ -325,17 +326,19 @@ void main() {
 
       await api.getThreadUploads('room-abc', 'thread-xyz');
 
-      final captured = verify(
-        () => mockTransport.request<Map<String, dynamic>>(
-          'GET',
-          captureAny(),
-          cancelToken: any(named: 'cancelToken'),
-          fromJson: any(named: 'fromJson'),
-          body: any(named: 'body'),
-          headers: any(named: 'headers'),
-          timeout: any(named: 'timeout'),
-        ),
-      ).captured.single as Uri;
+      final captured =
+          verify(
+                () => mockTransport.request<Map<String, dynamic>>(
+                  'GET',
+                  captureAny(),
+                  cancelToken: any(named: 'cancelToken'),
+                  fromJson: any(named: 'fromJson'),
+                  body: any(named: 'body'),
+                  headers: any(named: 'headers'),
+                  timeout: any(named: 'timeout'),
+                ),
+              ).captured.single
+              as Uri;
 
       expect(captured.path, endsWith('/uploads/room-abc/thread/thread-xyz'));
     });

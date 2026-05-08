@@ -38,37 +38,43 @@ void main() {
 
   // Default: upload methods succeed; override per test as needed.
   void stubUploadToRoomSuccess() {
-    when(() => mockApi.uploadFileToRoom(
-          any(),
-          filename: any(named: 'filename'),
-          fileBytes: any(named: 'fileBytes'),
-          mimeType: any(named: 'mimeType'),
-        )).thenAnswer((_) async {});
+    when(
+      () => mockApi.uploadFileToRoom(
+        any(),
+        filename: any(named: 'filename'),
+        fileBytes: any(named: 'fileBytes'),
+        mimeType: any(named: 'mimeType'),
+      ),
+    ).thenAnswer((_) async {});
   }
 
   void stubUploadToThreadSuccess() {
-    when(() => mockApi.uploadFileToThread(
-          any(),
-          any(),
-          filename: any(named: 'filename'),
-          fileBytes: any(named: 'fileBytes'),
-          mimeType: any(named: 'mimeType'),
-        )).thenAnswer((_) async {});
+    when(
+      () => mockApi.uploadFileToThread(
+        any(),
+        any(),
+        filename: any(named: 'filename'),
+        fileBytes: any(named: 'fileBytes'),
+        mimeType: any(named: 'mimeType'),
+      ),
+    ).thenAnswer((_) async {});
   }
 
   void stubGetRoomUploads(List<FileUpload> uploads) {
-    when(() => mockApi.getRoomUploads(
-          any(),
-          cancelToken: any(named: 'cancelToken'),
-        )).thenAnswer((_) async => uploads);
+    when(
+      () =>
+          mockApi.getRoomUploads(any(), cancelToken: any(named: 'cancelToken')),
+    ).thenAnswer((_) async => uploads);
   }
 
   void stubGetThreadUploads(List<FileUpload> uploads) {
-    when(() => mockApi.getThreadUploads(
-          any(),
-          any(),
-          cancelToken: any(named: 'cancelToken'),
-        )).thenAnswer((_) async => uploads);
+    when(
+      () => mockApi.getThreadUploads(
+        any(),
+        any(),
+        cancelToken: any(named: 'cancelToken'),
+      ),
+    ).thenAnswer((_) async => uploads);
   }
 
   group('initial fetch', () {
@@ -102,10 +108,12 @@ void main() {
 
   group('fetch failure', () {
     test('emits UploadsFailed from a non-Loaded state', () async {
-      when(() => mockApi.getRoomUploads(
-            any(),
-            cancelToken: any(named: 'cancelToken'),
-          )).thenThrow(const ApiException(statusCode: 500, message: 'boom'));
+      when(
+        () => mockApi.getRoomUploads(
+          any(),
+          cancelToken: any(named: 'cancelToken'),
+        ),
+      ).thenThrow(const ApiException(statusCode: 500, message: 'boom'));
 
       unawaited(tracker.refreshRoom('room-1'));
       await _pump();
@@ -122,12 +130,12 @@ void main() {
       await _pump();
       expect(tracker.roomUploads('room-1').value, isA<UploadsLoaded>());
 
-      when(() => mockApi.getRoomUploads(
-            any(),
-            cancelToken: any(named: 'cancelToken'),
-          )).thenThrow(
-        NetworkException(message: 'wifi down'),
-      );
+      when(
+        () => mockApi.getRoomUploads(
+          any(),
+          cancelToken: any(named: 'cancelToken'),
+        ),
+      ).thenThrow(NetworkException(message: 'wifi down'));
 
       await tracker.refreshRoom('room-1');
 
@@ -137,130 +145,145 @@ void main() {
     });
 
     test(
-        'wraps a non-SoliplexException into UploadsFailed(UnexpectedException)',
-        () async {
-      when(() => mockApi.getRoomUploads(
+      'wraps a non-SoliplexException into UploadsFailed(UnexpectedException)',
+      () async {
+        when(
+          () => mockApi.getRoomUploads(
             any(),
             cancelToken: any(named: 'cancelToken'),
-          )).thenAnswer((_) async {
-        throw StateError('unexpected non-soliplex error');
-      });
+          ),
+        ).thenAnswer((_) async {
+          throw StateError('unexpected non-soliplex error');
+        });
 
-      await tracker.refreshRoom('room-1');
+        await tracker.refreshRoom('room-1');
 
-      final status = tracker.roomUploads('room-1').value;
-      expect(status, isA<UploadsFailed>());
-      final failure = status as UploadsFailed;
-      expect(failure.error, isA<UnexpectedException>());
-      expect(failure.error.originalError, isA<StateError>());
-    });
+        final status = tracker.roomUploads('room-1').value;
+        expect(status, isA<UploadsFailed>());
+        final failure = status as UploadsFailed;
+        expect(failure.error, isA<UnexpectedException>());
+        expect(failure.error.originalError, isA<StateError>());
+      },
+    );
 
-    test('keeps stale Loaded list when a non-SoliplexException refresh fails',
-        () async {
-      stubGetRoomUploads([_fileUpload('a.pdf')]);
-      await tracker.refreshRoom('room-1');
-      expect(tracker.roomUploads('room-1').value, isA<UploadsLoaded>());
+    test(
+      'keeps stale Loaded list when a non-SoliplexException refresh fails',
+      () async {
+        stubGetRoomUploads([_fileUpload('a.pdf')]);
+        await tracker.refreshRoom('room-1');
+        expect(tracker.roomUploads('room-1').value, isA<UploadsLoaded>());
 
-      when(() => mockApi.getRoomUploads(
+        when(
+          () => mockApi.getRoomUploads(
             any(),
             cancelToken: any(named: 'cancelToken'),
-          )).thenAnswer((_) async {
-        throw TypeError();
-      });
+          ),
+        ).thenAnswer((_) async {
+          throw TypeError();
+        });
 
-      await tracker.refreshRoom('room-1');
+        await tracker.refreshRoom('room-1');
 
-      final status = tracker.roomUploads('room-1').value;
-      expect(status, isA<UploadsLoaded>());
-      expect((status as UploadsLoaded).uploads, hasLength(1));
-    });
+        final status = tracker.roomUploads('room-1').value;
+        expect(status, isA<UploadsLoaded>());
+        expect((status as UploadsLoaded).uploads, hasLength(1));
+      },
+    );
   });
 
   group('upload success', () {
-    test('appends Pending, then drops it when refresh surfaces Persisted',
-        () async {
-      stubGetRoomUploads([]);
-      unawaited(tracker.refreshRoom('room-1'));
-      await _pump();
+    test(
+      'appends Pending, then drops it when refresh surfaces Persisted',
+      () async {
+        stubGetRoomUploads([]);
+        unawaited(tracker.refreshRoom('room-1'));
+        await _pump();
 
-      final uploadCompleter = Completer<void>();
-      when(() => mockApi.uploadFileToRoom(
+        final uploadCompleter = Completer<void>();
+        when(
+          () => mockApi.uploadFileToRoom(
             any(),
             filename: any(named: 'filename'),
             fileBytes: any(named: 'fileBytes'),
             mimeType: any(named: 'mimeType'),
-          )).thenAnswer((_) => uploadCompleter.future);
+          ),
+        ).thenAnswer((_) => uploadCompleter.future);
 
-      tracker.uploadToRoom(
-        roomId: 'room-1',
-        filename: 'a.pdf',
-        fileBytes: const [1, 2, 3],
-      );
+        tracker.uploadToRoom(
+          roomId: 'room-1',
+          filename: 'a.pdf',
+          fileBytes: const [1, 2, 3],
+        );
 
-      // Pending appears immediately, atop the (empty) persisted list.
-      var entries =
-          (tracker.roomUploads('room-1').value as UploadsLoaded).uploads;
-      expect(entries, hasLength(1));
-      expect(entries.single, isA<PendingUpload>());
-      expect(entries.single.filename, 'a.pdf');
+        // Pending appears immediately, atop the (empty) persisted list.
+        var entries =
+            (tracker.roomUploads('room-1').value as UploadsLoaded).uploads;
+        expect(entries, hasLength(1));
+        expect(entries.single, isA<PendingUpload>());
+        expect(entries.single.filename, 'a.pdf');
 
-      // Next refresh returns the new file.
-      stubGetRoomUploads([_fileUpload('a.pdf')]);
+        // Next refresh returns the new file.
+        stubGetRoomUploads([_fileUpload('a.pdf')]);
 
-      uploadCompleter.complete();
-      await _pump();
+        uploadCompleter.complete();
+        await _pump();
 
-      entries = (tracker.roomUploads('room-1').value as UploadsLoaded).uploads;
-      expect(entries, hasLength(1));
-      expect(entries.single, isA<PersistedUpload>());
-      expect(entries.single.filename, 'a.pdf');
-    });
-
-    test('overwrite: renders both rows briefly, ends with single Persisted',
-        () async {
-      // Server already has a.pdf.
-      stubGetRoomUploads([_fileUpload('a.pdf', 'https://example.com/old')]);
-      unawaited(tracker.refreshRoom('room-1'));
-      await _pump();
-
-      final uploadCompleter = Completer<void>();
-      when(() => mockApi.uploadFileToRoom(
-            any(),
-            filename: any(named: 'filename'),
-            fileBytes: any(named: 'fileBytes'),
-            mimeType: any(named: 'mimeType'),
-          )).thenAnswer((_) => uploadCompleter.future);
-
-      tracker.uploadToRoom(
-        roomId: 'room-1',
-        filename: 'a.pdf',
-        fileBytes: const [1],
-      );
-
-      // Both rows visible during the POST: old Persisted + new Pending.
-      final duringUpload =
-          (tracker.roomUploads('room-1').value as UploadsLoaded).uploads;
-      expect(duringUpload, hasLength(2));
-      expect(duringUpload.whereType<PersistedUpload>(), hasLength(1));
-      expect(duringUpload.whereType<PendingUpload>(), hasLength(1));
-
-      // Refresh returns the new file (same filename, new url).
-      stubGetRoomUploads([_fileUpload('a.pdf', 'https://example.com/new')]);
-      uploadCompleter.complete();
-      await _pump();
-
-      final after =
-          (tracker.roomUploads('room-1').value as UploadsLoaded).uploads;
-      expect(after, hasLength(1));
-      expect(after.single, isA<PersistedUpload>());
-      expect(
-        (after.single as PersistedUpload).url.toString(),
-        'https://example.com/new',
-      );
-    });
+        entries =
+            (tracker.roomUploads('room-1').value as UploadsLoaded).uploads;
+        expect(entries, hasLength(1));
+        expect(entries.single, isA<PersistedUpload>());
+        expect(entries.single.filename, 'a.pdf');
+      },
+    );
 
     test(
-        'concurrent same-name uploads: first completion drops only the '
+      'overwrite: renders both rows briefly, ends with single Persisted',
+      () async {
+        // Server already has a.pdf.
+        stubGetRoomUploads([_fileUpload('a.pdf', 'https://example.com/old')]);
+        unawaited(tracker.refreshRoom('room-1'));
+        await _pump();
+
+        final uploadCompleter = Completer<void>();
+        when(
+          () => mockApi.uploadFileToRoom(
+            any(),
+            filename: any(named: 'filename'),
+            fileBytes: any(named: 'fileBytes'),
+            mimeType: any(named: 'mimeType'),
+          ),
+        ).thenAnswer((_) => uploadCompleter.future);
+
+        tracker.uploadToRoom(
+          roomId: 'room-1',
+          filename: 'a.pdf',
+          fileBytes: const [1],
+        );
+
+        // Both rows visible during the POST: old Persisted + new Pending.
+        final duringUpload =
+            (tracker.roomUploads('room-1').value as UploadsLoaded).uploads;
+        expect(duringUpload, hasLength(2));
+        expect(duringUpload.whereType<PersistedUpload>(), hasLength(1));
+        expect(duringUpload.whereType<PendingUpload>(), hasLength(1));
+
+        // Refresh returns the new file (same filename, new url).
+        stubGetRoomUploads([_fileUpload('a.pdf', 'https://example.com/new')]);
+        uploadCompleter.complete();
+        await _pump();
+
+        final after =
+            (tracker.roomUploads('room-1').value as UploadsLoaded).uploads;
+        expect(after, hasLength(1));
+        expect(after.single, isA<PersistedUpload>());
+        expect(
+          (after.single as PersistedUpload).url.toString(),
+          'https://example.com/new',
+        );
+      },
+    );
+
+    test('concurrent same-name uploads: first completion drops only the '
         'first pending; second completion drops the second', () async {
       stubGetRoomUploads([]);
       unawaited(tracker.refreshRoom('room-1'));
@@ -271,12 +294,14 @@ void main() {
       final completers = <Completer<void>>[firstCompleter, secondCompleter];
       var callIndex = 0;
 
-      when(() => mockApi.uploadFileToRoom(
-            any(),
-            filename: any(named: 'filename'),
-            fileBytes: any(named: 'fileBytes'),
-            mimeType: any(named: 'mimeType'),
-          )).thenAnswer((_) => completers[callIndex++].future);
+      when(
+        () => mockApi.uploadFileToRoom(
+          any(),
+          filename: any(named: 'filename'),
+          fileBytes: any(named: 'fileBytes'),
+          mimeType: any(named: 'mimeType'),
+        ),
+      ).thenAnswer((_) => completers[callIndex++].future);
 
       tracker.uploadToRoom(
         roomId: 'room-1',
@@ -304,8 +329,7 @@ void main() {
       firstCompleter.complete();
       await _pump();
 
-      pending = (tracker.roomUploads('room-1').value as UploadsLoaded)
-          .uploads
+      pending = (tracker.roomUploads('room-1').value as UploadsLoaded).uploads
           .whereType<PendingUpload>()
           .toList();
       expect(pending, hasLength(1));
@@ -315,8 +339,7 @@ void main() {
       secondCompleter.complete();
       await _pump();
 
-      pending = (tracker.roomUploads('room-1').value as UploadsLoaded)
-          .uploads
+      pending = (tracker.roomUploads('room-1').value as UploadsLoaded).uploads
           .whereType<PendingUpload>()
           .toList();
       expect(pending, isEmpty);
@@ -329,12 +352,14 @@ void main() {
       unawaited(tracker.refreshRoom('room-1'));
       await _pump();
 
-      when(() => mockApi.uploadFileToRoom(
-            any(),
-            filename: any(named: 'filename'),
-            fileBytes: any(named: 'fileBytes'),
-            mimeType: any(named: 'mimeType'),
-          )).thenThrow(const ApiException(statusCode: 500, message: 'nope'));
+      when(
+        () => mockApi.uploadFileToRoom(
+          any(),
+          filename: any(named: 'filename'),
+          fileBytes: any(named: 'fileBytes'),
+          mimeType: any(named: 'mimeType'),
+        ),
+      ).thenThrow(const ApiException(statusCode: 500, message: 'nope'));
 
       tracker.uploadToRoom(
         roomId: 'room-1',
@@ -344,8 +369,11 @@ void main() {
       await _pump();
 
       final status = tracker.roomUploads('room-1').value;
-      expect(status, isA<UploadsLoaded>(),
-          reason: 'POST failures must not transition the parent status');
+      expect(
+        status,
+        isA<UploadsLoaded>(),
+        reason: 'POST failures must not transition the parent status',
+      );
       final entries = (status as UploadsLoaded).uploads;
       expect(entries, hasLength(1));
       final failed = entries.single as FailedUpload;
@@ -354,39 +382,45 @@ void main() {
 
       // No extra list fetch was triggered by the failure — the catch
       // path must not call refresh. (Initial fetch is the one call.)
-      verify(() => mockApi.getRoomUploads(
-            any(),
-            cancelToken: any(named: 'cancelToken'),
-          )).called(1);
+      verify(
+        () => mockApi.getRoomUploads(
+          any(),
+          cancelToken: any(named: 'cancelToken'),
+        ),
+      ).called(1);
     });
 
-    test('non-Exception throw from POST becomes a Failed row, not a spinner',
-        () async {
-      stubGetRoomUploads([]);
-      unawaited(tracker.refreshRoom('room-1'));
-      await _pump();
+    test(
+      'non-Exception throw from POST becomes a Failed row, not a spinner',
+      () async {
+        stubGetRoomUploads([]);
+        unawaited(tracker.refreshRoom('room-1'));
+        await _pump();
 
-      when(() => mockApi.uploadFileToRoom(
+        when(
+          () => mockApi.uploadFileToRoom(
             any(),
             filename: any(named: 'filename'),
             fileBytes: any(named: 'fileBytes'),
             mimeType: any(named: 'mimeType'),
-          )).thenAnswer((_) async {
-        throw StateError('plugin bug');
-      });
+          ),
+        ).thenAnswer((_) async {
+          throw StateError('plugin bug');
+        });
 
-      tracker.uploadToRoom(
-        roomId: 'room-1',
-        filename: 'fail.pdf',
-        fileBytes: const [1],
-      );
-      await _pump();
+        tracker.uploadToRoom(
+          roomId: 'room-1',
+          filename: 'fail.pdf',
+          fileBytes: const [1],
+        );
+        await _pump();
 
-      final entries =
-          (tracker.roomUploads('room-1').value as UploadsLoaded).uploads;
-      expect(entries, hasLength(1));
-      expect(entries.single, isA<FailedUpload>());
-    });
+        final entries =
+            (tracker.roomUploads('room-1').value as UploadsLoaded).uploads;
+        expect(entries, hasLength(1));
+        expect(entries.single, isA<FailedUpload>());
+      },
+    );
   });
 
   group('recordClientError', () {
@@ -432,152 +466,165 @@ void main() {
       expect(threadEntries.single.filename, 'doc.pdf');
     });
 
-    test('assigns unique ids so each row is independently dismissible',
-        () async {
-      stubGetRoomUploads([]);
-      await tracker.refreshRoom('room-1');
+    test(
+      'assigns unique ids so each row is independently dismissible',
+      () async {
+        stubGetRoomUploads([]);
+        await tracker.refreshRoom('room-1');
 
-      tracker.recordClientError(
-        roomId: 'room-1',
-        filename: 'one.pdf',
-        message: 'fail',
-      );
-      tracker.recordClientError(
-        roomId: 'room-1',
-        filename: 'two.pdf',
-        message: 'fail',
-      );
+        tracker.recordClientError(
+          roomId: 'room-1',
+          filename: 'one.pdf',
+          message: 'fail',
+        );
+        tracker.recordClientError(
+          roomId: 'room-1',
+          filename: 'two.pdf',
+          message: 'fail',
+        );
 
-      final entries = (tracker.roomUploads('room-1').value as UploadsLoaded)
-          .uploads
-          .whereType<FailedUpload>()
-          .toList();
-      expect(entries, hasLength(2));
-      expect(entries[0].id, isNot(equals(entries[1].id)));
+        final entries = (tracker.roomUploads('room-1').value as UploadsLoaded)
+            .uploads
+            .whereType<FailedUpload>()
+            .toList();
+        expect(entries, hasLength(2));
+        expect(entries[0].id, isNot(equals(entries[1].id)));
 
-      tracker.dismissFailed(entries.first.id);
-      final remaining = (tracker.roomUploads('room-1').value as UploadsLoaded)
-          .uploads
-          .whereType<FailedUpload>();
-      expect(remaining.single.filename, 'two.pdf');
-    });
+        tracker.dismissFailed(entries.first.id);
+        final remaining = (tracker.roomUploads('room-1').value as UploadsLoaded)
+            .uploads
+            .whereType<FailedUpload>();
+        expect(remaining.single.filename, 'two.pdf');
+      },
+    );
   });
 
   group('re-fetch races', () {
-    test("cancelled upload-refresh doesn't strand a completed upload",
-        () async {
-      // Initial fetch: empty room.
-      stubGetRoomUploads([]);
-      unawaited(tracker.refreshRoom('room-1'));
-      await _pump();
+    test(
+      "cancelled upload-refresh doesn't strand a completed upload",
+      () async {
+        // Initial fetch: empty room.
+        stubGetRoomUploads([]);
+        unawaited(tracker.refreshRoom('room-1'));
+        await _pump();
 
-      final postA = Completer<void>();
-      final postB = Completer<void>();
-      final posts = [postA, postB];
-      var postIdx = 0;
+        final postA = Completer<void>();
+        final postB = Completer<void>();
+        final posts = [postA, postB];
+        var postIdx = 0;
 
-      when(() => mockApi.uploadFileToRoom(
+        when(
+          () => mockApi.uploadFileToRoom(
             any(),
             filename: any(named: 'filename'),
             fileBytes: any(named: 'fileBytes'),
             mimeType: any(named: 'mimeType'),
-          )).thenAnswer((_) => posts[postIdx++].future);
+          ),
+        ).thenAnswer((_) => posts[postIdx++].future);
 
-      // Each upload-triggered refresh gets its own completer so we
-      // can resolve them out of order.
-      final fetchA = Completer<List<FileUpload>>();
-      final fetchB = Completer<List<FileUpload>>();
-      final fetches = [fetchA, fetchB];
-      var fetchIdx = 0;
+        // Each upload-triggered refresh gets its own completer so we
+        // can resolve them out of order.
+        final fetchA = Completer<List<FileUpload>>();
+        final fetchB = Completer<List<FileUpload>>();
+        final fetches = [fetchA, fetchB];
+        var fetchIdx = 0;
 
-      when(() => mockApi.getRoomUploads(
+        when(
+          () => mockApi.getRoomUploads(
             any(),
             cancelToken: any(named: 'cancelToken'),
-          )).thenAnswer((_) => fetches[fetchIdx++].future);
+          ),
+        ).thenAnswer((_) => fetches[fetchIdx++].future);
 
-      tracker.uploadToRoom(
-        roomId: 'room-1',
-        filename: 'a.pdf',
-        fileBytes: const [1],
-      );
-      tracker.uploadToRoom(
-        roomId: 'room-1',
-        filename: 'b.pdf',
-        fileBytes: const [2],
-      );
+        tracker.uploadToRoom(
+          roomId: 'room-1',
+          filename: 'a.pdf',
+          fileBytes: const [1],
+        );
+        tracker.uploadToRoom(
+          roomId: 'room-1',
+          filename: 'b.pdf',
+          fileBytes: const [2],
+        );
 
-      postA.complete();
-      await _pump();
-      // A's refresh is now in flight (fetchA).
+        postA.complete();
+        await _pump();
+        // A's refresh is now in flight (fetchA).
 
-      postB.complete();
-      await _pump();
-      // B's refresh cancels A's token and starts fetchB.
+        postB.complete();
+        await _pump();
+        // B's refresh cancels A's token and starts fetchB.
 
-      // fetchA completes late — cancelled token, value ignored.
-      fetchA.complete([_fileUpload('a.pdf')]);
-      await _pump();
+        // fetchA completes late — cancelled token, value ignored.
+        fetchA.complete([_fileUpload('a.pdf')]);
+        await _pump();
 
-      // fetchB completes with both persisted files.
-      fetchB.complete([_fileUpload('a.pdf'), _fileUpload('b.pdf')]);
-      await _pump();
+        // fetchB completes with both persisted files.
+        fetchB.complete([_fileUpload('a.pdf'), _fileUpload('b.pdf')]);
+        await _pump();
 
-      final uploads =
-          (tracker.roomUploads('room-1').value as UploadsLoaded).uploads;
-      expect(
-        uploads.whereType<PersistedUpload>().map((e) => e.filename),
-        containsAll(['a.pdf', 'b.pdf']),
-      );
-      expect(
-        uploads.whereType<PendingUpload>(),
-        isEmpty,
-        reason: 'both uploads completed and appear in persisted; '
-            "neither should be stranded as pending even though A's "
-            'refresh was cancelled by B',
-      );
-    });
+        final uploads =
+            (tracker.roomUploads('room-1').value as UploadsLoaded).uploads;
+        expect(
+          uploads.whereType<PersistedUpload>().map((e) => e.filename),
+          containsAll(['a.pdf', 'b.pdf']),
+        );
+        expect(
+          uploads.whereType<PendingUpload>(),
+          isEmpty,
+          reason:
+              'both uploads completed and appear in persisted; '
+              "neither should be stranded as pending even though A's "
+              'refresh was cancelled by B',
+        );
+      },
+    );
 
-    test('late response from a cancelled fetch does not overwrite state',
-        () async {
-      final first = Completer<List<FileUpload>>();
-      final second = Completer<List<FileUpload>>();
-      final completers = [first, second];
-      var callIndex = 0;
+    test(
+      'late response from a cancelled fetch does not overwrite state',
+      () async {
+        final first = Completer<List<FileUpload>>();
+        final second = Completer<List<FileUpload>>();
+        final completers = [first, second];
+        var callIndex = 0;
 
-      when(() => mockApi.getRoomUploads(
+        when(
+          () => mockApi.getRoomUploads(
             any(),
             cancelToken: any(named: 'cancelToken'),
-          )).thenAnswer((_) => completers[callIndex++].future);
+          ),
+        ).thenAnswer((_) => completers[callIndex++].future);
 
-      unawaited(tracker.refreshRoom('room-1'));
-      // Kick a second fetch; internally this cancels the first token.
-      unawaited(tracker.refreshRoom('room-1'));
+        unawaited(tracker.refreshRoom('room-1'));
+        // Kick a second fetch; internally this cancels the first token.
+        unawaited(tracker.refreshRoom('room-1'));
 
-      // Complete the NEW fetch first, so the scope becomes Loaded
-      // with its result.
-      second.complete([_fileUpload('winner.pdf')]);
-      await _pump();
-      expect(
-        (tracker.roomUploads('room-1').value as UploadsLoaded)
-            .uploads
-            .single
-            .filename,
-        'winner.pdf',
-      );
+        // Complete the NEW fetch first, so the scope becomes Loaded
+        // with its result.
+        second.complete([_fileUpload('winner.pdf')]);
+        await _pump();
+        expect(
+          (tracker.roomUploads('room-1').value as UploadsLoaded)
+              .uploads
+              .single
+              .filename,
+          'winner.pdf',
+        );
 
-      // Now complete the cancelled fetch. Its guard must swallow the
-      // result; the scope must still show the newer list.
-      first.complete([_fileUpload('loser.pdf')]);
-      await _pump();
+        // Now complete the cancelled fetch. Its guard must swallow the
+        // result; the scope must still show the newer list.
+        first.complete([_fileUpload('loser.pdf')]);
+        await _pump();
 
-      expect(
-        (tracker.roomUploads('room-1').value as UploadsLoaded)
-            .uploads
-            .single
-            .filename,
-        'winner.pdf',
-      );
-    });
+        expect(
+          (tracker.roomUploads('room-1').value as UploadsLoaded)
+              .uploads
+              .single
+              .filename,
+          'winner.pdf',
+        );
+      },
+    );
   });
 
   group('dismissFailed', () {
@@ -586,12 +633,14 @@ void main() {
       unawaited(tracker.refreshRoom('room-1'));
       await _pump();
 
-      when(() => mockApi.uploadFileToRoom(
-            any(),
-            filename: any(named: 'filename'),
-            fileBytes: any(named: 'fileBytes'),
-            mimeType: any(named: 'mimeType'),
-          )).thenThrow(NetworkException(message: 'dns'));
+      when(
+        () => mockApi.uploadFileToRoom(
+          any(),
+          filename: any(named: 'filename'),
+          fileBytes: any(named: 'fileBytes'),
+          mimeType: any(named: 'mimeType'),
+        ),
+      ).thenThrow(NetworkException(message: 'dns'));
 
       tracker.uploadToRoom(
         roomId: 'room-1',
@@ -633,12 +682,14 @@ void main() {
       await _pump();
 
       final never = Completer<void>();
-      when(() => mockApi.uploadFileToRoom(
-            any(),
-            filename: any(named: 'filename'),
-            fileBytes: any(named: 'fileBytes'),
-            mimeType: any(named: 'mimeType'),
-          )).thenAnswer((_) => never.future);
+      when(
+        () => mockApi.uploadFileToRoom(
+          any(),
+          filename: any(named: 'filename'),
+          fileBytes: any(named: 'fileBytes'),
+          mimeType: any(named: 'mimeType'),
+        ),
+      ).thenAnswer((_) => never.future);
 
       tracker.uploadToRoom(
         roomId: 'room-1',
@@ -656,8 +707,7 @@ void main() {
       // The pending record survives — assertion fires but release-mode
       // behavior still refuses the removal.
       expect(
-        (tracker.roomUploads('room-1').value as UploadsLoaded)
-            .uploads
+        (tracker.roomUploads('room-1').value as UploadsLoaded).uploads
             .whereType<PendingUpload>(),
         hasLength(1),
       );
@@ -688,11 +738,13 @@ void main() {
     test('distinct threads under the same room are independent', () async {
       // Use a call counter so each thread scope gets its own list.
       var callCount = 0;
-      when(() => mockApi.getThreadUploads(
-            any(),
-            any(),
-            cancelToken: any(named: 'cancelToken'),
-          )).thenAnswer((invocation) async {
+      when(
+        () => mockApi.getThreadUploads(
+          any(),
+          any(),
+          cancelToken: any(named: 'cancelToken'),
+        ),
+      ).thenAnswer((invocation) async {
         final threadId = invocation.positionalArguments[1] as String;
         callCount++;
         return [_fileUpload('$threadId.pdf')];
@@ -721,10 +773,12 @@ void main() {
       final never = Completer<List<FileUpload>>();
       CancelToken? capturedToken;
 
-      when(() => mockApi.getRoomUploads(
-            any(),
-            cancelToken: any(named: 'cancelToken'),
-          )).thenAnswer((invocation) {
+      when(
+        () => mockApi.getRoomUploads(
+          any(),
+          cancelToken: any(named: 'cancelToken'),
+        ),
+      ).thenAnswer((invocation) {
         capturedToken = invocation.namedArguments[#cancelToken] as CancelToken?;
         return never.future;
       });
@@ -740,32 +794,36 @@ void main() {
       expect(capturedToken!.isCancelled, isTrue);
     });
 
-    test('does not cancel in-flight uploads (POSTs have no CancelToken)',
-        () async {
-      stubGetRoomUploads([]);
-      unawaited(tracker.refreshRoom('room-1'));
-      await _pump();
+    test(
+      'does not cancel in-flight uploads (POSTs have no CancelToken)',
+      () async {
+        stubGetRoomUploads([]);
+        unawaited(tracker.refreshRoom('room-1'));
+        await _pump();
 
-      // The upload method has no cancelToken parameter — intentional
-      // per plan. Verify the signature in the stub doesn't reference one.
-      when(() => mockApi.uploadFileToRoom(
+        // The upload method has no cancelToken parameter — intentional
+        // per plan. Verify the signature in the stub doesn't reference one.
+        when(
+          () => mockApi.uploadFileToRoom(
             any(),
             filename: any(named: 'filename'),
             fileBytes: any(named: 'fileBytes'),
             mimeType: any(named: 'mimeType'),
-          )).thenAnswer((_) async {});
+          ),
+        ).thenAnswer((_) async {});
 
-      tracker.uploadToRoom(
-        roomId: 'room-1',
-        filename: 'x.pdf',
-        fileBytes: const [0],
-      );
-      tracker.dispose();
+        tracker.uploadToRoom(
+          roomId: 'room-1',
+          filename: 'x.pdf',
+          fileBytes: const [0],
+        );
+        tracker.dispose();
 
-      // No exception; dispose completes cleanly even with an in-flight
-      // upload Future. (The Future continues but its result is ignored
-      // because _isDisposed is set.)
-    });
+        // No exception; dispose completes cleanly even with an in-flight
+        // upload Future. (The Future continues but its result is ignored
+        // because _isDisposed is set.)
+      },
+    );
 
     test('roomUploads throws StateError after dispose', () {
       tracker.dispose();
