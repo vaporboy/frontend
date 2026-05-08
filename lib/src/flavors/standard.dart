@@ -29,8 +29,7 @@ import '../modules/room/ui/markdown/markdown_theme_extension.dart';
 const _defaultLogoAsset = 'assets/branding/soliplex/logo_1024.png';
 const _logoSize = 64.0;
 
-ThemeData _defaultTheme() {
-  final base = soliplexLightTheme();
+ThemeData _withMarkdownExtension(ThemeData base) {
   final colorScheme = base.colorScheme;
   final textTheme = base.textTheme;
   final colors = base.extension<SoliplexTheme>()!.colors;
@@ -66,9 +65,14 @@ ThemeData _defaultTheme() {
   );
 }
 
+ThemeData _defaultLightTheme() => _withMarkdownExtension(soliplexLightTheme());
+ThemeData _defaultDarkTheme() => _withMarkdownExtension(soliplexDarkTheme());
+
 Future<ShellConfig> standard({
   String appName = 'Soliplex',
   ThemeData? theme,
+  ThemeData? darkTheme,
+  ThemeMode themeMode = ThemeMode.system,
   String redirectScheme = 'ai.soliplex.client',
   String defaultBackendUrl = 'http://localhost:8000',
   CallbackParams callbackParams = const NoCallbackParams(),
@@ -138,7 +142,9 @@ Future<ShellConfig> standard({
   return ShellConfig(
     appName: appName,
     logo: logo,
-    theme: theme ?? _defaultTheme(),
+    theme: theme ?? _defaultLightTheme(),
+    darkTheme: darkTheme ?? _defaultDarkTheme(),
+    themeMode: themeMode,
     initialRoute: callbackParams is! NoCallbackParams
         ? '/auth/callback'
         : (serverManager.authState.value is Authenticated ? '/lobby' : '/'),

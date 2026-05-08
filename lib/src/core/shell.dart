@@ -39,6 +39,8 @@ class _SoliplexShellState extends State<SoliplexShell> {
       child: MaterialApp.router(
         title: widget.config.appName,
         theme: widget.config.theme,
+        darkTheme: widget.config.darkTheme,
+        themeMode: widget.config.themeMode,
         routerConfig: _router,
       ),
     );
