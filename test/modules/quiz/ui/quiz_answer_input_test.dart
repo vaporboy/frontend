@@ -2,24 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:soliplex_client/soliplex_client.dart';
 
+import 'package:soliplex_frontend/src/design/theme/theme.dart';
 import 'package:soliplex_frontend/src/modules/quiz/quiz_session.dart';
 import 'package:soliplex_frontend/src/modules/quiz/ui/quiz_answer_input.dart';
 
 void main() {
-  Widget wrap(Widget child) => MaterialApp(home: Scaffold(body: child));
+  Widget wrap(Widget child) => MaterialApp(
+    theme: soliplexLightTheme(),
+    home: Scaffold(body: child),
+  );
 
   group('QuizMultipleChoiceInput', () {
-    testWidgets('renders all options', (tester) async {
+    testWidgets('renders all options with A/B/C letter tiles', (tester) async {
       await tester.pumpWidget(
         wrap(
           QuizMultipleChoiceInput(
-            options: const ['A', 'B', 'C'],
+            options: const ['Apple', 'Banana', 'Cherry'],
             selectedOption: null,
             questionState: const AwaitingInput(),
             onSelected: (_) {},
           ),
         ),
       );
+      expect(find.text('Apple'), findsOneWidget);
+      expect(find.text('Banana'), findsOneWidget);
+      expect(find.text('Cherry'), findsOneWidget);
       expect(find.text('A'), findsOneWidget);
       expect(find.text('B'), findsOneWidget);
       expect(find.text('C'), findsOneWidget);
@@ -30,71 +37,69 @@ void main() {
       await tester.pumpWidget(
         wrap(
           QuizMultipleChoiceInput(
-            options: const ['A', 'B'],
+            options: const ['Apple', 'Banana'],
             selectedOption: null,
             questionState: const AwaitingInput(),
             onSelected: (v) => selected = v,
           ),
         ),
       );
-      await tester.tap(find.text('A'));
-      expect(selected, 'A');
+      await tester.tap(find.text('Apple'));
+      expect(selected, 'Apple');
     });
 
-    testWidgets('shows check icon on correct selected option', (tester) async {
+    testWidgets('shows ✓ mark on correct selected option', (tester) async {
       await tester.pumpWidget(
         wrap(
           QuizMultipleChoiceInput(
-            options: const ['A', 'B'],
-            selectedOption: 'A',
+            options: const ['Apple', 'Banana'],
+            selectedOption: 'Apple',
             questionState: const Answered(
-              MultipleChoiceInput('A'),
+              MultipleChoiceInput('Apple'),
               CorrectAnswer(),
             ),
             onSelected: (_) {},
           ),
         ),
       );
-      expect(find.byIcon(Icons.check_circle), findsOneWidget);
+      expect(find.text('✓'), findsOneWidget);
     });
 
-    testWidgets('shows cancel icon on wrong selected option', (tester) async {
+    testWidgets('shows × mark on wrong selected option', (tester) async {
       await tester.pumpWidget(
         wrap(
           QuizMultipleChoiceInput(
-            options: const ['A', 'B'],
-            selectedOption: 'A',
+            options: const ['Apple', 'Banana'],
+            selectedOption: 'Apple',
             questionState: const Answered(
-              MultipleChoiceInput('A'),
-              IncorrectAnswer(expectedAnswer: 'B'),
+              MultipleChoiceInput('Apple'),
+              IncorrectAnswer(expectedAnswer: 'Banana'),
             ),
             onSelected: (_) {},
           ),
         ),
       );
-      expect(find.byIcon(Icons.cancel), findsOneWidget);
+      expect(find.text('×'), findsOneWidget);
     });
 
-    testWidgets('highlights correct option when answer is incorrect', (
+    testWidgets('marks correct option AND wrong selected option', (
       tester,
     ) async {
       await tester.pumpWidget(
         wrap(
           QuizMultipleChoiceInput(
-            options: const ['A', 'B'],
-            selectedOption: 'A',
+            options: const ['Apple', 'Banana'],
+            selectedOption: 'Apple',
             questionState: const Answered(
-              MultipleChoiceInput('A'),
-              IncorrectAnswer(expectedAnswer: 'B'),
+              MultipleChoiceInput('Apple'),
+              IncorrectAnswer(expectedAnswer: 'Banana'),
             ),
             onSelected: (_) {},
           ),
         ),
       );
-      // The correct option 'B' should show check_circle
-      // The wrong selected option 'A' should show cancel
-      expect(find.byIcon(Icons.check_circle), findsOneWidget);
-      expect(find.byIcon(Icons.cancel), findsOneWidget);
+      expect(find.text('✓'), findsOneWidget);
+      expect(find.text('×'), findsOneWidget);
     });
 
     testWidgets('disables options when submitting', (tester) async {
@@ -102,14 +107,14 @@ void main() {
       await tester.pumpWidget(
         wrap(
           QuizMultipleChoiceInput(
-            options: const ['A', 'B'],
-            selectedOption: 'A',
-            questionState: const Submitting(MultipleChoiceInput('A')),
+            options: const ['Apple', 'Banana'],
+            selectedOption: 'Apple',
+            questionState: const Submitting(MultipleChoiceInput('Apple')),
             onSelected: (v) => selected = v,
           ),
         ),
       );
-      await tester.tap(find.text('B'));
+      await tester.tap(find.text('Banana'));
       expect(selected, isNull);
     });
 
@@ -118,17 +123,17 @@ void main() {
       await tester.pumpWidget(
         wrap(
           QuizMultipleChoiceInput(
-            options: const ['A', 'B'],
-            selectedOption: 'A',
+            options: const ['Apple', 'Banana'],
+            selectedOption: 'Apple',
             questionState: const Answered(
-              MultipleChoiceInput('A'),
+              MultipleChoiceInput('Apple'),
               CorrectAnswer(),
             ),
             onSelected: (v) => selected = v,
           ),
         ),
       );
-      await tester.tap(find.text('B'));
+      await tester.tap(find.text('Banana'));
       expect(selected, isNull);
     });
   });

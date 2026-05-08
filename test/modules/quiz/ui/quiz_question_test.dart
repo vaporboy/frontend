@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:soliplex_client/soliplex_client.dart';
 
+import 'package:soliplex_frontend/src/design/theme/theme.dart';
 import 'package:soliplex_frontend/src/modules/quiz/quiz_session.dart';
 import 'package:soliplex_frontend/src/modules/quiz/ui/quiz_answer_input.dart';
 import 'package:soliplex_frontend/src/modules/quiz/ui/quiz_question.dart';
 
 void main() {
-  Widget wrap(Widget child) => MaterialApp(home: Scaffold(body: child));
+  Widget wrap(Widget child) => MaterialApp(
+    theme: soliplexLightTheme(),
+    home: Scaffold(body: child),
+  );
 
   testWidgets('shows question text and progress', (tester) async {
     final session = QuizInProgress(
@@ -38,7 +42,8 @@ void main() {
       ),
     );
     expect(find.text('What is 2+2?'), findsOneWidget);
-    expect(find.text('Question 1 of 2'), findsOneWidget);
+    expect(find.text('1 / 2'), findsOneWidget);
+    expect(find.text('Quiz · Test'), findsOneWidget);
   });
 
   testWidgets('submit button disabled when awaiting input', (tester) async {
@@ -235,7 +240,7 @@ void main() {
           QuizQuestion(
             id: 'q1',
             text: 'Pick one',
-            type: MultipleChoice(['A', 'B', 'C']),
+            type: MultipleChoice(['Apple', 'Banana', 'Cherry']),
           ),
         ],
       ),
@@ -258,9 +263,9 @@ void main() {
       ),
     );
     expect(find.byType(QuizMultipleChoiceInput), findsOneWidget);
-    expect(find.text('A'), findsOneWidget);
-    expect(find.text('B'), findsOneWidget);
-    expect(find.text('C'), findsOneWidget);
+    expect(find.text('Apple'), findsOneWidget);
+    expect(find.text('Banana'), findsOneWidget);
+    expect(find.text('Cherry'), findsOneWidget);
   });
 
   testWidgets('renders text input for FillBlank question', (tester) async {
@@ -321,7 +326,7 @@ void main() {
         ),
       ),
     );
-    expect(find.text('Correct!'), findsOneWidget);
+    expect(find.text('CORRECT'), findsOneWidget);
   });
 
   testWidgets('shows See Results button on last question', (tester) async {

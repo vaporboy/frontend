@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:soliplex_client/soliplex_client.dart';
 
+import 'package:soliplex_frontend/src/design/theme/theme.dart';
 import 'package:soliplex_frontend/src/modules/quiz/ui/quiz_screen.dart';
 
 import '../../../helpers/fakes.dart';
@@ -35,7 +36,10 @@ void main() {
         ),
       ],
     );
-    return MaterialApp.router(routerConfig: router);
+    return MaterialApp.router(
+      theme: soliplexLightTheme(),
+      routerConfig: router,
+    );
   }
 
   testWidgets('shows loading then quiz title', (tester) async {
@@ -129,7 +133,7 @@ void main() {
     await tester.tap(find.text('Start Quiz'));
     await tester.pumpAndSettle();
     expect(find.text('What is 1+1?'), findsOneWidget);
-    expect(find.text('Question 1 of 1'), findsOneWidget);
+    expect(find.text('1 / 1'), findsOneWidget);
 
     // Type an answer
     await tester.enterText(find.byType(TextField), '2');
@@ -179,7 +183,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // See result and proceed
-    expect(find.text('Correct!'), findsOneWidget);
+    expect(find.text('CORRECT'), findsOneWidget);
     await tester.tap(find.text('See Results'));
     await tester.pumpAndSettle();
     expect(find.text('Quiz Complete!'), findsOneWidget);
@@ -286,7 +290,7 @@ void main() {
     await tester.tap(find.text('Retake Quiz'));
     await tester.pumpAndSettle();
     expect(find.text('Q?'), findsOneWidget);
-    expect(find.text('Question 1 of 1'), findsOneWidget);
+    expect(find.text('1 / 1'), findsOneWidget);
   });
 
   testWidgets('leave-quiz dialog: cancel stays on quiz', (tester) async {

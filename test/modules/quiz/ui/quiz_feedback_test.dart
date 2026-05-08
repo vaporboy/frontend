@@ -2,20 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:soliplex_client/soliplex_client.dart';
 
+import 'package:soliplex_frontend/src/design/theme/theme.dart';
 import 'package:soliplex_frontend/src/modules/quiz/ui/quiz_feedback.dart';
 
 void main() {
-  Widget wrap(Widget child) => MaterialApp(home: Scaffold(body: child));
+  Widget wrap(Widget child) => MaterialApp(
+    theme: soliplexLightTheme(),
+    home: Scaffold(body: child),
+  );
 
-  testWidgets('shows Correct! for correct answer', (tester) async {
+  testWidgets('shows CORRECT header for correct answer', (tester) async {
     await tester.pumpWidget(
       wrap(const QuizAnswerFeedback(result: CorrectAnswer())),
     );
-    expect(find.text('Correct!'), findsOneWidget);
-    expect(find.byIcon(Icons.check_circle), findsOneWidget);
+    expect(find.text('CORRECT'), findsOneWidget);
   });
 
-  testWidgets('shows expected answer for incorrect', (tester) async {
+  testWidgets('shows CORRECT ANSWER header and expected text for incorrect', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       wrap(
         const QuizAnswerFeedback(
@@ -23,9 +28,8 @@ void main() {
         ),
       ),
     );
-    expect(find.text('Incorrect'), findsOneWidget);
-    expect(find.text('Expected: Paris'), findsOneWidget);
-    expect(find.byIcon(Icons.cancel), findsOneWidget);
+    expect(find.text('CORRECT ANSWER'), findsOneWidget);
+    expect(find.text('Paris'), findsOneWidget);
   });
 
   testWidgets('QuizErrorFeedback shows error message and retry', (
