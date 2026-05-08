@@ -1,6 +1,6 @@
 # Soliplex Visual Design System
 
-Version 1.0 --- 2026-04-22
+Version 1.1 --- 2026-04-23
 
 ---
 
@@ -87,20 +87,19 @@ Colors are accessed through two paths:
 | inversePrimary | `colorScheme.inversePrimary` | `colors.inversePrimary` | Inverted primary for contrast |
 | link | --- | `colors.link` | Hyperlinks, tappable references |
 
-**Semantic status colors** (to be added to `SoliplexColors` per Q3
-decision):
+**Semantic status colors** (fields on `SoliplexColors`, tenant-overridable):
 
-| Role | When to use |
-| ---- | ----------- |
-| info | Informational banners, tooltips |
-| warning | Warning banners, validation hints |
-| danger | Critical alerts (distinct from destructive/error for non-action contexts) |
-| success | Success banners, completion indicators |
+| Role | Dart accessor (SoliplexColors) | When to use |
+| ---- | ------------------------------ | ----------- |
+| info | `colors.info` | Informational banners, tooltips |
+| warning | `colors.warning` | Warning banners, validation hints |
+| danger | `colors.danger` | Critical alerts (distinct from destructive/error for non-action contexts) |
+| success | `colors.success` | Success banners, completion indicators |
 
-These are currently defined in `lib/src/design/color/color_scheme_extensions.dart`
-as a `SymbolicColors` extension using raw Material `Colors.*` values.
-**Action required:** migrate these four roles into `SoliplexColors` so
-tenants can override them.
+A backward-compatible `SymbolicColors` extension on `ColorScheme` still
+exists in `lib/src/design/color/color_scheme_extensions.dart` for call
+sites that lack a `BuildContext`. Prefer `SoliplexTheme.of(context).colors.*`
+in widget code so that tenants can override these values.
 
 **File:** `lib/src/design/tokens/colors.dart`
 
@@ -143,11 +142,11 @@ Spacing is defined in `lib/src/design/tokens/spacing.dart` as
 | s2 | 8 | `SoliplexSpacing.s2` | Default inner padding, small gaps |
 | s3 | 12 | `SoliplexSpacing.s3` | Medium padding, card content insets |
 | s4 | 16 | `SoliplexSpacing.s4` | Standard section padding, list item padding |
-| s5 | 20 | `SoliplexSpacing.s5` | Extended padding for emphasis **[to be added]** |
+| s5 | 20 | `SoliplexSpacing.s5` | Extended padding for emphasis |
 | s6 | 24 | `SoliplexSpacing.s6` | Large separation between sections |
-| s8 | 32 | `SoliplexSpacing.s8` | Extra-large separation, page margins **[to be added]** |
+| s8 | 32 | `SoliplexSpacing.s8` | Extra-large separation, page margins |
 
-**Action required:** Add `s5 = 20` and `s8 = 32` to `SoliplexSpacing`.
+`s5` and `s8` have been added to `SoliplexSpacing`.
 
 **File:** `lib/src/design/tokens/spacing.dart`
 
@@ -159,34 +158,33 @@ Border radii are defined in `lib/src/design/tokens/radii.dart` as
 
 | Token | Value (dp) | Dart accessor | When to use |
 | ----- | ---------- | ------------- | ----------- |
-| xs | 4 | `soliplexRadii.xs` | Inline code, small badges, tight corners **[to be added]** |
-| sm | 8 | `soliplexRadii.sm` | Default card corners, code blocks, containers **[to be realigned from 6]** |
+| xs | 4 | `soliplexRadii.xs` | Inline code, small badges, tight corners |
+| sm | 8 | `soliplexRadii.sm` | Default card corners, code blocks, containers |
 | md | 12 | `soliplexRadii.md` | Buttons, inputs, tiles, dialogs (unchanged) |
 | lg | 16 | `soliplexRadii.lg` | Large cards, modals (unchanged) |
 | xl | 24 | `soliplexRadii.xl` | Hero surfaces, sheets (unchanged) |
 
-**Action required:** Add `xs = 4`, change `sm` from 6 to 8. The
-`soliplexRadii` constant and all `BorderRadius.circular(...)` calls
-referencing these values must be updated.
+`xs = 4` has been added, `sm` changed from 6 to 8. The `soliplexRadii`
+constant and `BorderRadius.circular(...)` calls have been updated across
+the codebase.
 
 **File:** `lib/src/design/tokens/radii.dart`
 
 ### 1.5 Motion
 
-**Action required:** Create `lib/src/design/tokens/motion.dart` with
-duration and curve tokens. No motion tokens exist today. The following
-scale is recommended based on Material 3 conventions:
+Motion tokens are defined in `lib/src/design/tokens/motion.dart` as
+`SoliplexMotion`. Values follow Material 3 conventions:
 
 | Token | Value | Dart accessor | When to use |
 | ----- | ----- | ------------- | ----------- |
-| durationShort | 150ms | `SoliplexMotion.durationShort` | Micro-interactions: button press, icon swap **[to be created]** |
-| durationMedium | 300ms | `SoliplexMotion.durationMedium` | Standard transitions: expand/collapse, fade **[to be created]** |
-| durationLong | 500ms | `SoliplexMotion.durationLong` | Complex transitions: page enter, sheet slide **[to be created]** |
-| curveStandard | `Curves.easeInOut` | `SoliplexMotion.curveStandard` | Default easing for most animations **[to be created]** |
-| curveDecelerate | `Curves.easeOut` | `SoliplexMotion.curveDecelerate` | Elements entering the screen **[to be created]** |
-| curveAccelerate | `Curves.easeIn` | `SoliplexMotion.curveAccelerate` | Elements leaving the screen **[to be created]** |
+| durationShort | 150ms | `SoliplexMotion.durationShort` | Micro-interactions: button press, icon swap |
+| durationMedium | 300ms | `SoliplexMotion.durationMedium` | Standard transitions: expand/collapse, fade |
+| durationLong | 500ms | `SoliplexMotion.durationLong` | Complex transitions: page enter, sheet slide |
+| curveStandard | `Curves.easeInOut` | `SoliplexMotion.curveStandard` | Default easing for most animations |
+| curveDecelerate | `Curves.easeOut` | `SoliplexMotion.curveDecelerate` | Elements entering the screen |
+| curveAccelerate | `Curves.easeIn` | `SoliplexMotion.curveAccelerate` | Elements leaving the screen |
 
-**File:** `lib/src/design/tokens/motion.dart` (to be created)
+**File:** `lib/src/design/tokens/motion.dart`
 
 ### 1.6 Elevation scale
 
@@ -275,8 +273,8 @@ that mirrors the structure of `lib/src/flavors/standard.dart`. The flavor
 function:
 
 1. References the tenant's color constants.
-2. Constructs `ThemeData` via `soliplexLightTheme(colors: ...)` (and
-   `soliplexDarkTheme(colors: ...)` once dark mode is implemented).
+2. Constructs `ThemeData` via `soliplexLightTheme(colors: ...)` and
+   `soliplexDarkTheme(colors: ...)` for light and dark modes.
 3. Adds the `MarkdownThemeExtension`.
 4. References the tenant's logo asset.
 5. Composes the same module set as the standard flavor (unless the
@@ -293,8 +291,8 @@ assets/branding/soliplex/
   logo_splash_android12.png
 
 lib/src/design/tokens/colors.dart
-  -> lightSoliplexColors (30 fields)
-  -> darkSoliplexColors (30 fields)
+  -> lightSoliplexColors (35 fields)
+  -> darkSoliplexColors (35 fields)
 
 lib/src/flavors/standard.dart
   -> standard() async => ShellConfig(
@@ -309,8 +307,7 @@ lib/src/flavors/standard.dart
 - **Missing asset file:** The build will fail at `flutter build` if a
   declared asset path does not resolve. There is no runtime fallback.
 - **Missing color field:** Compile error. `SoliplexColors` requires all
-  30 fields (plus info/warning/danger/success once Q3 migration is
-  complete).
+  35 fields.
 - **Missing flavor function:** No fallback. The app entry point must
   reference a specific flavor.
 
@@ -386,7 +383,8 @@ transient feedback (success/error).
 - Wraps content in `Semantics(button: true, label: tooltip)`.
 - Touch target: inherits `IconButton` default (48dp).
 
-**Golden test:** **TBD --- no golden tests exist yet.**
+**Golden test:** `test/golden/shared/copy_button_golden_test.dart`
+(light default, dark default, custom tooltip)
 
 **Tenant-overridable:** Icon color follows `colorScheme`, so it
 inherits the tenant's color scheme automatically.
@@ -402,7 +400,8 @@ inherits the tenant's color scheme automatically.
 - Each button wrapped in `Semantics(button: true, label: tooltip)`.
 - Touch target: inherits `IconButton` default (48dp).
 
-**Golden test:** **TBD --- no golden tests exist yet.**
+**Golden test:** `test/golden/room/feedback_buttons_golden_test.dart`
+(light idle, dark idle)
 
 ### 3.3 CodeBlockBuilder
 
@@ -417,7 +416,8 @@ highlighting and a copy button.
   `Semantics(label: 'Code block in {language}')`.
 - SVG code blocks: `Semantics(label: 'SVG image')`.
 
-**Golden test:** **TBD --- no golden tests exist yet.**
+**Golden test:** `test/golden/room/code_block_builder_golden_test.dart`
+(light plaintext, light dart, dark plaintext)
 
 ### 3.4 HttpStatusDisplay
 
@@ -430,7 +430,9 @@ highlighting and a copy button.
 - `Semantics(label: group.statusDescription)` with `ExcludeSemantics`
   on decorative child.
 
-**Golden test:** **TBD --- no golden tests exist yet.**
+**Golden test:** `test/golden/diagnostics/http_status_display_golden_test.dart`
+(light success, dark success, light pending, light 404, light stream
+complete)
 
 ### 3.5 HttpEventTile
 
@@ -443,7 +445,8 @@ network inspector.
 
 - `Semantics(label: group.semanticLabel)`.
 
-**Golden test:** **TBD --- no golden tests exist yet.**
+**Golden test:** `test/golden/diagnostics/http_event_tile_golden_test.dart`
+(light default, light dense, light selected, dark default)
 
 ### 3.6 All other widgets
 
@@ -455,7 +458,7 @@ module-internal. They are not documented individually here but must:
 2. Meet the accessibility floor in section 4.
 3. Respond to breakpoints per section 1.7.
 
-**Golden tests:** **TBD --- no golden tests exist for any widget.**
+**Golden tests:** Module-internal widgets do not yet have golden tests.
 
 ---
 
@@ -495,12 +498,8 @@ Do not use `constraints: const BoxConstraints()` or
 `VisualDensity.compact` on interactive elements without ensuring the
 resulting touch target still meets 48dp.
 
-**Known violations (from audit):**
-
-- `room_screen.dart:757-759` --- close icon with zero constraints
-- `upload_event_banner.dart:276-283` --- close icon with zero constraints
-- `room_info_screen.dart:564-566` --- compact density buttons
-- `request_detail_view.dart:223,231` --- 32x32 tab buttons
+All known violations from the audit have been fixed (constraints set to
+minimum 48x48dp).
 
 ### 4.4 Keyboard navigation
 
@@ -519,9 +518,8 @@ resulting touch target still meets 48dp.
   that conveys its purpose.
 - Decorative elements must be excluded from the semantics tree
   (`ExcludeSemantics` or `Semantics(excludeSemantics: true)`).
-- AG-UI streaming surfaces (message timeline, loading tiles) must use
+- AG-UI streaming surfaces (message timeline, loading tiles) use
   `Semantics(liveRegion: true)` so screen readers announce new content.
-  **TBD --- no live-region semantics exist yet.**
 - Citation readback: when a citation is expanded, its content must be
   announced. **TBD --- not implemented.**
 - Announcement throttling: streaming text should not overwhelm the
@@ -563,15 +561,19 @@ enforced:
 
 ### 5.2 Golden tests
 
-**TBD --- zero golden tests exist.** Golden tests should be created for
-every component listed in section 3, covering:
+Golden tests exist for all five section 3 components, covering default
+states in light and dark themes. Files live at
+`test/golden/<module>/<widget>_golden_test.dart`.
 
-- Default state in light theme
-- Default state in dark theme (once implemented)
-- Each interaction state (hover, focus, pressed, disabled, error)
-- Each breakpoint (mobile, tablet, desktop) for responsive widgets
+To generate or update baseline images:
 
-Golden test files should live at `test/golden/<module>/<widget>_test.dart`.
+```bash
+flutter test test/golden/ --update-goldens
+```
+
+Future coverage should expand to include interaction states (hover,
+focus, pressed, disabled, error) and breakpoint variants (mobile,
+tablet, desktop) for responsive widgets.
 
 ### 5.3 Accessibility tests
 
@@ -667,7 +669,7 @@ If a token, component, or theming surface is removed or renamed:
 
 **Decision date:** 2026-04-22
 
-**Decision-makers:** Team (recorded in `docs/design-system/decisions.md`)
+**Decision-makers:** EK, AR, JJ (recorded in `docs/design-system/decisions.md`)
 
 ---
 
@@ -764,48 +766,47 @@ named tokens.
 
 ## Next steps
 
-### TBDs ranked by downstream impact
+### Completed
 
-1. **Motion tokens (section 1.5)** --- blocks any animation
-   standardization. Create `lib/src/design/tokens/motion.dart`.
-   *Blocks: enforcement lint for motion consistency.*
+Items 1--9 from the original TBD list have been resolved:
 
-2. **Spacing token additions (section 1.3)** --- `s5` and `s8` must
-   exist before lints can flag bare `20` and `32` literals.
-   *Blocks: `no_hardcoded_spacing` lint rule.*
+- Motion tokens created (`lib/src/design/tokens/motion.dart`)
+- Spacing tokens s5 and s8 added; hardcoded spacing migrated to tokens
+- Border radius scale realigned (xs=4, sm=8); hardcoded radii migrated
+- Semantic status colors added to `SoliplexColors`; call sites updated
+- `context.monospace` adopted across all monospace sites
+- `soliplexDarkTheme()` created
+- Live-region semantics added to streaming surfaces
+- Touch targets fixed to 48dp minimum
+- Hardcoded colors and inline TextStyles migrated to tokens/theme
+- Golden tests created for all 5 section 3 components (light + dark)
 
-3. **Border radius realignment (section 1.4)** --- add `xs`, change
-   `sm` from 6 to 8, then migrate all `BorderRadius.circular(4)` and
-   `BorderRadius.circular(8)` calls.
-   *Blocks: `no_hardcoded_radii` lint rule.*
+### Remaining TBDs
 
-4. **Semantic status colors migration (section 1.1)** --- move
-   info/warning/danger/success from `SymbolicColors` extension into
-   `SoliplexColors` fields.
-   *Blocks: tenant overridability of status colors.*
+1. **Lint package creation (section 5.1)** --- create
+   `packages/soliplex_lints/` with token enforcement rules.
+   *Blocks: automated enforcement of all token rules.*
 
-5. **`context.monospace` adoption (section 1.2)** --- migrate all inline
-   monospace `TextStyle` constructions to use `context.monospace`.
-   *Blocks: `no_inline_textstyle` lint rule for monospace.*
+2. **Contrast ratio validation (section 4.2)** --- automated checking
+   of tenant color palettes against WCAG AA ratios.
 
-6. **Dark theme function (Q7)** --- create `soliplexDarkTheme()`.
-   *Blocks: dark mode support, dark golden tests.*
+3. **Citation readback (section 4.5)** --- announce citation content to
+   screen readers when expanded.
 
-7. **Golden tests (section 5.2)** --- create golden tests for all
-   section 3 components.
-   *Blocks: visual regression safety net.*
+4. **Announcement throttling (section 4.5)** --- debounce streaming text
+   announcements to avoid overwhelming screen readers.
 
-8. **Live-region semantics (section 4.5)** --- add `Semantics(liveRegion: true)`
-   to streaming surfaces.
-   *Blocks: screen reader usability for chat.*
+5. **Keyboard navigation tests (section 4.4)** --- verify Tab order and
+   focus trapping in modals.
 
-9. **Touch target fixes (section 4.3)** --- fix the four known
-   undersized touch targets.
-   *Blocks: WCAG AA compliance.*
+6. **Reduced motion handling (section 4.6)** --- respect platform
+   `disableAnimations` setting.
 
-10. **Lint package creation (section 5.1)** --- create
-    `packages/soliplex_lints/` with the rules listed in section 5.1.
-    *Blocks: automated enforcement of all token rules.*
+7. **CI accessibility pipeline (section 5.4)** --- golden test
+   comparison, accessibility audits, contrast validation in CI.
 
-Once items 1--5 are resolved, run **`design-system-enforce`** to create
-the lint package and automated checks.
+8. **Release verification skill (section 5.5)** --- automated
+   pre-release checklist.
+
+Run **`design-system-enforce`** to create the lint package and automated
+checks.
