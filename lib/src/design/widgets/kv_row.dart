@@ -19,20 +19,17 @@ class KvRow extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final mono = context.monospace.copyWith(fontSize: fontSize, height: 1.4);
 
-    return RichText(
-      text: TextSpan(
-        style: mono,
+    return Text.rich(
+      TextSpan(
         children: [
           TextSpan(
             text: '$k ',
             style: TextStyle(color: cs.onSurfaceVariant),
           ),
-          TextSpan(
-            text: v,
-            style: TextStyle(color: cs.onSurface),
-          ),
+          TextSpan(text: v, style: TextStyle(color: cs.onSurface)),
         ],
       ),
+      style: mono,
     );
   }
 }

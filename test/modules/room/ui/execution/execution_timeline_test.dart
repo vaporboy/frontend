@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:soliplex_agent/soliplex_agent.dart';
 
+import 'package:soliplex_frontend/src/design/widgets/status_dot.dart';
 import 'package:soliplex_frontend/src/modules/room/execution_tracker.dart';
 import 'package:soliplex_frontend/src/modules/room/message_expansions.dart';
 import 'package:soliplex_frontend/src/modules/room/room_providers.dart';
@@ -155,11 +156,11 @@ void main() {
     expect(find.byIcon(Icons.chevron_right), findsNothing);
   });
 
-  testWidgets('generic args fall back to JSON preview', (tester) async {
+  testWidgets('short args render inline as KV pairs', (tester) async {
     events.value = const ActivitySnapshot(
       messageId: 'rag:call_1',
       activityType: 'skill_tool_call',
-      content: {'tool_name': 'lookup', 'args': '{"doc_id":"abc"}'},
+      content: {'tool_name': 'lookup', 'args': '{"doc_id":"abc","top_k":4}'},
       timestamp: 100,
     );
 
@@ -167,13 +168,14 @@ void main() {
     await tester.pump();
     await tester.tap(find.text('1 event'));
     await tester.pump();
-    await tester.tap(find.text('lookup'));
-    await tester.pump();
 
-    expect(find.textContaining('"doc_id"'), findsOneWidget);
+    // No expansion needed — args appear inline once the timeline opens.
+    expect(find.textContaining('doc_id'), findsAtLeastNWidgets(1));
+    expect(find.textContaining('abc'), findsAtLeastNWidgets(1));
+    expect(find.textContaining('top_k'), findsAtLeastNWidgets(1));
   });
 
-  testWidgets('completed step shows check_circle icon', (tester) async {
+  testWidgets('completed step renders with done dot state', (tester) async {
     events.value = const ServerToolCallStarted(
       toolName: 'search',
       toolCallId: 'tc-1',
@@ -188,7 +190,8 @@ void main() {
     await tester.tap(find.text('1 event'));
     await tester.pump();
 
-    expect(find.byIcon(Icons.check_circle), findsOneWidget);
+    final dot = tester.widget<StatusDot>(find.byType(StatusDot).first);
+    expect(dot.state, StatusDotState.done);
   });
 
   testWidgets('orphan activity rendered when no active step', (tester) async {

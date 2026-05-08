@@ -1,14 +1,15 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-
-import '../../../../design/tokens/radii.dart';
-import '../../../../design/tokens/spacing.dart';
-import '../../../../design/tokens/typography_x.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 import 'package:soliplex_agent/soliplex_agent.dart' hide State;
 
+import '../../../../design/tokens/spacing.dart';
+import '../../../../design/tokens/typography_x.dart';
+import '../../../../design/widgets/kv_row.dart';
+import '../../../../design/widgets/status_dot.dart';
+import '../../../../design/widgets/status_pill.dart';
 import '../../compute_display_messages.dart' show loadingMessageId;
 import '../../execution_step.dart';
 import '../../execution_tracker.dart';
@@ -17,10 +18,10 @@ import '../../room_providers.dart';
 import '../copy_button.dart';
 import 'timeline_entry.dart';
 
-/// Unified execution timeline — single collapsible that nests activities
-/// under their owning step. Activity rows with source (script/code/query
-/// args, or any args map) can expand to a monospace preview with a copy
-/// button.
+/// Vertical execution timeline rendered as a rail of dots connected by a
+/// continuous line, matching the m-exec-step pattern in the design system
+/// handoff. The outer collapse is preserved so long timelines stay compact
+/// inside a chat answer until the user opens them.
 class ExecutionTimeline extends ConsumerStatefulWidget {
   const ExecutionTimeline({
     super.key,
@@ -38,19 +39,12 @@ class ExecutionTimeline extends ConsumerStatefulWidget {
 }
 
 class _ExecutionTimelineState extends ConsumerState<ExecutionTimeline> {
-  // Expansion state while messageId == loadingMessageId. Kept local
-  // (not in the store) because the sentinel is reused across runs —
-  // persisting under it would leak open/closed state into the next
-  // response.
+  // See class doc on the previous implementation: expansion state for the
+  // AwaitingText phase is kept local because loadingMessageId is reused
+  // across runs and would leak open/closed state between responses.
   bool _loadingPhaseTimeline = false;
   final Set<String> _loadingPhaseSources = <String>{};
 
-  // Persistence handle — null during the AwaitingText phase, because
-  // loadingMessageId is reused across runs and persisting under it would
-  // leak state into the next response. Captured once in initState; the
-  // AwaitingText → TextStreaming transition remounts this widget under
-  // a real messageId (see MessageTimeline's per-id ValueKey), at which
-  // point [_expansion] becomes non-null for the rest of its life.
   MessageExpansion? _expansion;
 
   @override
@@ -98,163 +92,258 @@ class _ExecutionTimelineState extends ConsumerState<ExecutionTimeline> {
     final entries = widget.tracker.timeline.watch(context);
     if (entries.isEmpty) return const SizedBox.shrink();
 
-    final total = entries.fold<int>(
-      0,
-      (sum, e) => sum + (e is TimelineStep ? 1 + e.activities.length : 1),
-    );
+    final flat = _flatten(entries);
 
     return Padding(
-      padding: EdgeInsets.only(bottom: SoliplexSpacing.s2),
-      child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: SoliplexSpacing.s3,
-          vertical: 6,
-        ),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surfaceContainerLow,
-          borderRadius: BorderRadius.circular(6),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            GestureDetector(
-              onTap: _toggleExpanded,
-              behavior: HitTestBehavior.opaque,
-              child: Row(
-                children: [
-                  Icon(
-                    _expanded ? Icons.expand_more : Icons.chevron_right,
-                    size: 16,
+      padding: const EdgeInsets.only(bottom: SoliplexSpacing.s2),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          GestureDetector(
+            onTap: _toggleExpanded,
+            behavior: HitTestBehavior.opaque,
+            child: Row(
+              children: [
+                Icon(
+                  _expanded ? Icons.expand_more : Icons.chevron_right,
+                  size: 16,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  '${flat.length} event${flat.length == 1 ? '' : 's'}',
+                  style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
-                  const SizedBox(width: 4),
-                  Text(
-                    '$total event${total == 1 ? '' : 's'}',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            if (_expanded) ...[
-              const SizedBox(height: 4),
-              for (final entry in entries) _buildEntry(entry, theme),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEntry(TimelineEntry entry, ThemeData theme) {
-    switch (entry) {
-      case TimelineStep(:final step, :final activities):
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _stepRow(step, theme),
-            for (final activity in activities)
-              _activityRow(activity, theme, indent: 20),
-          ],
-        );
-      case TimelineOrphanActivity(:final activity):
-        return _activityRow(activity, theme, indent: 0);
-    }
-  }
-
-  Widget _stepRow(ExecutionStep step, ThemeData theme) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(
-        children: [
-          _stepIcon(step, theme),
-          SizedBox(width: SoliplexSpacing.s2),
-          Expanded(
-            child: Text(
-              step.label,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+                ),
+              ],
             ),
           ),
-          Text(
-            _formatDuration(step.timestamp),
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.outline,
-              fontSize: 11,
-            ),
-          ),
+          if (_expanded) ...[
+            const SizedBox(height: SoliplexSpacing.s2),
+            for (var i = 0; i < flat.length; i++)
+              _StepRow(rowData: flat[i], isLast: i == flat.length - 1),
+          ],
         ],
       ),
     );
   }
 
-  Widget _activityRow(
-    SkillToolCallActivity activity,
-    ThemeData theme, {
-    required double indent,
+  /// Flattens steps + their child activities into a single ordered list of
+  /// rail rows. Matching the handoff demo, every step and every activity
+  /// renders as an independent m-exec-step entry.
+  List<_RowData> _flatten(List<TimelineEntry> entries) {
+    final out = <_RowData>[];
+    for (final entry in entries) {
+      switch (entry) {
+        case TimelineStep(:final step, :final activities):
+          out.add(_RowData.fromStep(step));
+          for (final activity in activities) {
+            out.add(
+              _RowData.fromActivity(
+                activity,
+                isExpanded: _isSourceExpanded(activity.messageId),
+                onToggle: () => _toggleSource(activity.messageId),
+              ),
+            );
+          }
+        case TimelineOrphanActivity(:final activity):
+          out.add(
+            _RowData.fromActivity(
+              activity,
+              isExpanded: _isSourceExpanded(activity.messageId),
+              onToggle: () => _toggleSource(activity.messageId),
+            ),
+          );
+      }
+    }
+    return out;
+  }
+}
+
+class _RowData {
+  const _RowData({
+    required this.label,
+    required this.dotState,
+    this.icon,
+    this.meta,
+    this.argDetails = const [],
+    this.expandableSource,
+    this.isSourceExpanded = false,
+    this.onToggleSource,
+  });
+
+  factory _RowData.fromStep(ExecutionStep step) {
+    return _RowData(
+      label: step.label,
+      dotState: switch (step.status) {
+        StepStatus.active => StatusDotState.running,
+        StepStatus.completed => StatusDotState.done,
+        StepStatus.failed => StatusDotState.failed,
+      },
+      icon: _iconForStepType(step.type),
+      meta: _formatDuration(step.timestamp),
+    );
+  }
+
+  factory _RowData.fromActivity(
+    SkillToolCallActivity activity, {
+    required bool isExpanded,
+    required VoidCallback onToggle,
   }) {
     final source = _pickSource(activity);
-    final hasSource = source != null;
-    final isExpanded = _isSourceExpanded(activity.messageId);
+    final argDetails = _shortArgsAsKv(activity.args);
+    return _RowData(
+      label: activity.toolName,
+      dotState: _statusToDotState(activity.status),
+      icon: _iconForToolName(activity.toolName),
+      meta: activity.status,
+      argDetails: argDetails,
+      expandableSource: argDetails.isEmpty ? source : null,
+      isSourceExpanded: isExpanded,
+      onToggleSource: source != null && argDetails.isEmpty ? onToggle : null,
+    );
+  }
 
-    return Padding(
-      padding: EdgeInsets.only(left: indent, top: 2, bottom: 2),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+  final String label;
+  final StatusDotState dotState;
+  final IconData? icon;
+  final String? meta;
+  final List<MapEntry<String, String>> argDetails;
+  final String? expandableSource;
+  final bool isSourceExpanded;
+  final VoidCallback? onToggleSource;
+}
+
+class _StepRow extends StatelessWidget {
+  const _StepRow({required this.rowData, required this.isLast});
+
+  final _RowData rowData;
+  final bool isLast;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final mono = context.monospace;
+
+    final hasExpandable = rowData.expandableSource != null;
+
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          GestureDetector(
-            onTap: hasSource ? () => _toggleSource(activity.messageId) : null,
-            behavior: HitTestBehavior.opaque,
-            child: Row(
+          SizedBox(
+            width: 20,
+            child: Column(
               children: [
-                SizedBox(
-                  width: 14,
-                  child: hasSource
-                      ? Icon(
-                          isExpanded ? Icons.expand_more : Icons.chevron_right,
-                          size: 14,
-                          color: theme.colorScheme.onSurfaceVariant,
-                        )
-                      : const SizedBox.shrink(),
-                ),
-                const SizedBox(width: 2),
-                _activityStatusIcon(activity.status, theme),
-                SizedBox(width: SoliplexSpacing.s2),
-                Expanded(
-                  child: Text(
-                    activity.toolName,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ),
-                if (activity.status != null)
-                  Text(
-                    activity.status!,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.outline,
-                      fontSize: 11,
+                const SizedBox(height: 2),
+                StatusDot(state: rowData.dotState),
+                if (!isLast)
+                  Expanded(
+                    child: Container(
+                      width: 2,
+                      margin: const EdgeInsets.only(top: 2),
+                      color: cs.outlineVariant,
                     ),
                   ),
               ],
             ),
           ),
-          if (hasSource && isExpanded) _sourceBlock(source, theme),
+          const SizedBox(width: SoliplexSpacing.s3),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: SoliplexSpacing.s4),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GestureDetector(
+                    onTap: rowData.onToggleSource,
+                    behavior: HitTestBehavior.opaque,
+                    child: Row(
+                      children: [
+                        if (rowData.icon != null) ...[
+                          Icon(
+                            rowData.icon,
+                            size: 14,
+                            color: rowData.dotState == StatusDotState.pending
+                                ? cs.onSurfaceVariant
+                                : cs.onSurface,
+                          ),
+                          const SizedBox(width: 6),
+                        ],
+                        Flexible(
+                          child: Text(
+                            rowData.label,
+                            style: mono.copyWith(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              color: rowData.dotState == StatusDotState.pending
+                                  ? cs.onSurfaceVariant
+                                  : cs.onSurface,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: SoliplexSpacing.s2),
+                        if (rowData.meta != null && rowData.meta!.isNotEmpty)
+                          StatusPill(
+                            label: rowData.meta!,
+                            variant: StatusPillVariant.outline,
+                            monospace: true,
+                          ),
+                        if (hasExpandable) ...[
+                          const SizedBox(width: 4),
+                          Icon(
+                            rowData.isSourceExpanded
+                                ? Icons.expand_more
+                                : Icons.chevron_right,
+                            size: 14,
+                            color: cs.onSurfaceVariant,
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  if (rowData.argDetails.isNotEmpty) ...[
+                    const SizedBox(height: 6),
+                    Wrap(
+                      spacing: SoliplexSpacing.s4,
+                      runSpacing: 4,
+                      children: [
+                        for (final entry in rowData.argDetails)
+                          KvRow(k: entry.key, v: entry.value),
+                      ],
+                    ),
+                  ],
+                  if (hasExpandable && rowData.isSourceExpanded)
+                    _SourceBlock(source: rowData.expandableSource!),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
+}
 
-  Widget _sourceBlock(String source, ThemeData theme) {
+class _SourceBlock extends StatelessWidget {
+  const _SourceBlock({required this.source});
+
+  final String source;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final mono = context.monospace;
     return Padding(
-      padding: EdgeInsets.only(top: 4, bottom: 6, left: SoliplexSpacing.s6),
+      padding: const EdgeInsets.only(top: 6),
       child: Container(
-        padding: EdgeInsets.all(SoliplexSpacing.s2),
+        padding: const EdgeInsets.all(SoliplexSpacing.s2),
         decoration: BoxDecoration(
-          color: theme.colorScheme.surfaceContainer,
-          borderRadius: BorderRadius.circular(soliplexRadii.xs),
+          color: cs.surfaceContainer,
+          borderRadius: BorderRadius.circular(4),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -265,81 +354,91 @@ class _ExecutionTimelineState extends ConsumerState<ExecutionTimeline> {
             ),
             SelectableText(
               source,
-              style: context.monospace.copyWith(fontSize: 12, height: 1.3),
+              style: mono.copyWith(fontSize: 12, height: 1.3),
             ),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget _stepIcon(ExecutionStep step, ThemeData theme) {
-    switch (step.status) {
-      case StepStatus.active:
-        return SizedBox(
-          width: 12,
-          height: 12,
-          child: CircularProgressIndicator(
-            strokeWidth: 1.5,
-            color: theme.colorScheme.primary,
-          ),
-        );
-      case StepStatus.failed:
-        return Icon(Icons.error, size: 12, color: theme.colorScheme.error);
-      case StepStatus.completed:
-        return Icon(
-          Icons.check_circle,
-          size: 12,
-          color: step.type == StepType.thinking
-              ? theme.colorScheme.tertiary
-              : theme.colorScheme.primary,
-        );
-    }
-  }
+IconData _iconForStepType(StepType type) => switch (type) {
+  StepType.thinking => Icons.auto_awesome_outlined,
+  StepType.toolCall => Icons.terminal,
+};
 
-  Widget _activityStatusIcon(String? status, ThemeData theme) {
-    switch (status) {
-      case 'in_progress':
-      case 'running':
-        return SizedBox(
-          width: 12,
-          height: 12,
-          child: CircularProgressIndicator(
-            strokeWidth: 1.5,
-            color: theme.colorScheme.primary,
-          ),
-        );
-      case 'failed':
-      case 'error':
-        return Icon(Icons.error, size: 12, color: theme.colorScheme.error);
-      case 'done':
-      case 'completed':
-      case 'success':
-        return Icon(
-          Icons.check_circle,
-          size: 12,
-          color: theme.colorScheme.primary,
-        );
-      default:
-        return Icon(
-          Icons.circle_outlined,
-          size: 12,
-          color: theme.colorScheme.outline,
-        );
-    }
+IconData _iconForToolName(String toolName) {
+  final lower = toolName.toLowerCase();
+  if (lower.contains('search') || lower.contains('retriev')) {
+    return Icons.search;
   }
+  if (lower.contains('synth') ||
+      lower.contains('compose') ||
+      lower.contains('write')) {
+    return Icons.auto_awesome_outlined;
+  }
+  if (lower.contains('cite') || lower.contains('check')) {
+    return Icons.task_alt;
+  }
+  if (lower.contains('plan')) {
+    return Icons.chevron_right;
+  }
+  return Icons.terminal;
+}
 
-  static String? _pickSource(SkillToolCallActivity activity) {
-    for (final key in const ['script', 'code', 'query']) {
-      final value = activity.args[key];
-      if (value is String && value.isNotEmpty) return value;
-    }
-    if (activity.args.isEmpty) return null;
-    return const JsonEncoder.withIndent('  ').convert(activity.args);
+StatusDotState _statusToDotState(String? status) {
+  switch (status) {
+    case 'in_progress':
+    case 'running':
+    case 'streaming':
+      return StatusDotState.running;
+    case 'failed':
+    case 'error':
+      return StatusDotState.failed;
+    case 'done':
+    case 'completed':
+    case 'success':
+      return StatusDotState.done;
+    default:
+      return StatusDotState.pending;
   }
+}
 
-  static String _formatDuration(Duration d) {
-    final seconds = d.inMilliseconds / 1000;
-    return '${seconds.toStringAsFixed(1)}s';
+/// Returns the activity's args as inline KV pairs when small enough to
+/// render in a row of pills. Returns an empty list when the args are
+/// empty, contain a long source-style payload (script/code/query), or
+/// have any value over 80 chars.
+List<MapEntry<String, String>> _shortArgsAsKv(Map<String, dynamic> args) {
+  if (args.isEmpty) return const [];
+  if (args.containsKey('script') ||
+      args.containsKey('code') ||
+      args.containsKey('query') && args.length == 1) {
+    return const [];
   }
+  if (args.length > 4) return const [];
+
+  final out = <MapEntry<String, String>>[];
+  for (final entry in args.entries) {
+    final str = entry.value is String
+        ? entry.value as String
+        : entry.value.toString();
+    if (str.length > 80) return const [];
+    out.add(MapEntry(entry.key, str));
+  }
+  return out;
+}
+
+String? _pickSource(SkillToolCallActivity activity) {
+  for (final key in const ['script', 'code', 'query']) {
+    final value = activity.args[key];
+    if (value is String && value.isNotEmpty) return value;
+  }
+  if (activity.args.isEmpty) return null;
+  return const JsonEncoder.withIndent('  ').convert(activity.args);
+}
+
+String _formatDuration(Duration d) {
+  final seconds = d.inMilliseconds / 1000;
+  return '${seconds.toStringAsFixed(1)}s';
 }
