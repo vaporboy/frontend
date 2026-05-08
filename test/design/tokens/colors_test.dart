@@ -45,6 +45,10 @@ void main() {
         surfaceContainerHighest: Colors.grey,
         inversePrimary: Colors.grey,
         link: Colors.blue,
+        info: Colors.blue,
+        warning: Colors.orange,
+        danger: Colors.red,
+        success: Colors.green,
       );
       expect(colors.background, Colors.white);
       expect(colors.foreground, Colors.black);

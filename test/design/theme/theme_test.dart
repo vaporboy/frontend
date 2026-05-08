@@ -48,6 +48,10 @@ void main() {
         surfaceContainerHighest: Colors.grey,
         inversePrimary: Colors.grey,
         link: Colors.blue,
+        info: Colors.blue,
+        warning: Colors.orange,
+        danger: Colors.red,
+        success: Colors.green,
       );
 
       final theme = soliplexLightTheme(colors: customColors);
@@ -101,13 +105,17 @@ void main() {
       expect(cs.surface, lightSoliplexColors.background);
       expect(cs.onSurface, lightSoliplexColors.foreground);
       expect(cs.onSurfaceVariant, lightSoliplexColors.mutedForeground);
-      expect(cs.surfaceContainerLowest,
-          lightSoliplexColors.surfaceContainerLowest);
+      expect(
+        cs.surfaceContainerLowest,
+        lightSoliplexColors.surfaceContainerLowest,
+      );
       expect(cs.surfaceContainerLow, lightSoliplexColors.surfaceContainerLow);
       expect(cs.surfaceContainer, lightSoliplexColors.inputBackground);
       expect(cs.surfaceContainerHigh, lightSoliplexColors.surfaceContainerHigh);
-      expect(cs.surfaceContainerHighest,
-          lightSoliplexColors.surfaceContainerHighest);
+      expect(
+        cs.surfaceContainerHighest,
+        lightSoliplexColors.surfaceContainerHighest,
+      );
       expect(cs.surfaceDim, lightSoliplexColors.accent);
       expect(cs.surfaceBright, lightSoliplexColors.background);
       expect(cs.surfaceTint, lightSoliplexColors.primary);

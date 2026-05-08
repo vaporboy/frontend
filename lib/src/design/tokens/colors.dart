@@ -33,6 +33,10 @@ class SoliplexColors {
     required this.surfaceContainerHighest,
     required this.inversePrimary,
     required this.link,
+    required this.info,
+    required this.warning,
+    required this.danger,
+    required this.success,
   });
 
   final Color background;
@@ -66,6 +70,10 @@ class SoliplexColors {
   final Color surfaceContainerHighest;
   final Color inversePrimary;
   final Color link;
+  final Color info;
+  final Color warning;
+  final Color danger;
+  final Color success;
 }
 
 const lightSoliplexColors = SoliplexColors(
@@ -100,6 +108,10 @@ const lightSoliplexColors = SoliplexColors(
   surfaceContainerHighest: Color(0xFFE4E4E4),
   inversePrimary: Color(0xFFB0B0B0),
   link: Color(0xFF2563EB),
+  info: Color(0xFF2196F3),
+  warning: Color(0xFFFF9800),
+  danger: Color(0xFFF44336),
+  success: Color(0xFF4CAF50),
 );
 
 const darkSoliplexColors = SoliplexColors(
@@ -134,4 +146,8 @@ const darkSoliplexColors = SoliplexColors(
   surfaceContainerHighest: Color(0xFF333333),
   inversePrimary: Color(0xFF555555),
   link: Color(0xFF60A5FA),
+  info: Color(0xFF64B5F6),
+  warning: Color(0xFFFFB74D),
+  danger: Color(0xFFE57373),
+  success: Color(0xFF81C784),
 );

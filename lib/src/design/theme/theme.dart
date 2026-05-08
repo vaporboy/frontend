@@ -7,9 +7,20 @@ import '../tokens/typography.dart';
 import 'theme_extensions.dart';
 
 ThemeData soliplexLightTheme({SoliplexColors colors = lightSoliplexColors}) {
+  return _buildTheme(colors: colors, brightness: Brightness.light);
+}
+
+ThemeData soliplexDarkTheme({SoliplexColors colors = darkSoliplexColors}) {
+  return _buildTheme(colors: colors, brightness: Brightness.dark);
+}
+
+ThemeData _buildTheme({
+  required SoliplexColors colors,
+  required Brightness brightness,
+}) {
   final textTheme = soliplexTextTheme(colors);
   final colorScheme = ColorScheme(
-    brightness: Brightness.light,
+    brightness: brightness,
     // Primary
     primary: colors.primary,
     onPrimary: colors.onPrimary,
@@ -55,7 +66,7 @@ ThemeData soliplexLightTheme({SoliplexColors colors = lightSoliplexColors}) {
   );
 
   return ThemeData(
-    brightness: Brightness.light,
+    brightness: brightness,
     colorScheme: colorScheme,
     appBarTheme: AppBarTheme(
       backgroundColor: colors.onPrimary,
@@ -177,7 +188,7 @@ ThemeData soliplexLightTheme({SoliplexColors colors = lightSoliplexColors}) {
         vertical: SoliplexSpacing.s1,
       ),
       secondarySelectedColor: colors.primary.withAlpha(25),
-      brightness: Brightness.light,
+      brightness: brightness,
     ),
     checkboxTheme: CheckboxThemeData(
       shape: RoundedRectangleBorder(
