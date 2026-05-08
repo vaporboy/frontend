@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:soliplex_agent/soliplex_agent.dart' hide State;
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../design/tokens/radii.dart';
+import '../../../design/theme/theme_extensions.dart';
 import '../../../design/tokens/spacing.dart';
-import 'markdown/flutter_markdown_plus_renderer.dart';
+import '../../../design/tokens/typography_x.dart';
 
-class CitationsSection extends StatefulWidget {
+class CitationsSection extends StatelessWidget {
   const CitationsSection({
     super.key,
     required this.sourceReferences,
@@ -17,226 +17,222 @@ class CitationsSection extends StatefulWidget {
   final void Function(SourceReference)? onShowChunkVisualization;
 
   @override
-  State<CitationsSection> createState() => _CitationsSectionState();
-}
-
-class _CitationsSectionState extends State<CitationsSection> {
-  bool _sectionExpanded = false;
-  final Set<int> _expandedIndices = {};
-
-  @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final count = widget.sourceReferences.length;
+    if (sourceReferences.isEmpty) return const SizedBox.shrink();
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(height: SoliplexSpacing.s2),
-        InkWell(
-          onTap: () => setState(() => _sectionExpanded = !_sectionExpanded),
-          borderRadius: BorderRadius.circular(soliplexRadii.sm),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Transform.flip(
-                  flipX: true,
-                  child: Icon(
-                    Icons.format_quote,
-                    size: 16,
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  '$count source${count == 1 ? '' : 's'}',
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                const SizedBox(width: 2),
-                Icon(
-                  _sectionExpanded ? Icons.expand_less : Icons.expand_more,
-                  size: 16,
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ],
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final count = sourceReferences.length;
+
+    return Padding(
+      padding: const EdgeInsets.only(top: SoliplexSpacing.s4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(height: 1, color: cs.outlineVariant),
+          const SizedBox(height: SoliplexSpacing.s3),
+          Text(
+            'SOURCES · $count CITATION${count == 1 ? '' : 'S'}',
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: cs.onSurfaceVariant,
+              fontWeight: FontWeight.w500,
+              letterSpacing: 0.7,
             ),
           ),
-        ),
-        if (_sectionExpanded) ...[
-          const SizedBox(height: 4),
-          ...List.generate(widget.sourceReferences.length, (index) {
-            final ref = widget.sourceReferences[index];
-            return _SourceReferenceRow(
-              sourceReference: ref,
-              badgeNumber: ref.index ?? (index + 1),
-              isExpanded: _expandedIndices.contains(index),
-              onToggle: () => setState(() {
-                if (_expandedIndices.contains(index)) {
-                  _expandedIndices.remove(index);
-                } else {
-                  _expandedIndices.add(index);
-                }
-              }),
-              onShowChunkVisualization: widget.onShowChunkVisualization,
-            );
-          }),
+          const SizedBox(height: SoliplexSpacing.s2),
+          for (var i = 0; i < sourceReferences.length; i++)
+            _CitationCard(
+              ref: sourceReferences[i],
+              number: sourceReferences[i].index ?? i + 1,
+              onShowChunkVisualization: onShowChunkVisualization,
+            ),
         ],
-      ],
+      ),
     );
   }
 }
 
-class _SourceReferenceRow extends StatelessWidget {
-  const _SourceReferenceRow({
-    required this.sourceReference,
-    required this.badgeNumber,
-    required this.isExpanded,
-    required this.onToggle,
+class _CitationCard extends StatelessWidget {
+  const _CitationCard({
+    required this.ref,
+    required this.number,
     this.onShowChunkVisualization,
   });
 
-  final SourceReference sourceReference;
-  final int badgeNumber;
-  final bool isExpanded;
-  final VoidCallback onToggle;
+  final SourceReference ref;
+  final int number;
   final void Function(SourceReference)? onShowChunkVisualization;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final radii = SoliplexTheme.of(context).radii;
+    final mono = context.monospace;
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
-      child: Column(
+    final filename =
+        Uri.tryParse(ref.documentUri)?.pathSegments.lastOrNull ??
+        ref.documentUri;
+    final whereParts = <String>[
+      if (filename.isNotEmpty) filename,
+      if (ref.formattedPageNumbers != null) ref.formattedPageNumbers!,
+      if (ref.headings.isNotEmpty) '§${ref.headings.first}',
+    ];
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: SoliplexSpacing.s2),
+      padding: const EdgeInsets.all(SoliplexSpacing.s3),
+      decoration: BoxDecoration(
+        color: cs.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(radii.md),
+        border: Border.all(color: cs.outlineVariant),
+      ),
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          InkWell(
-            onTap: onToggle,
-            borderRadius: BorderRadius.circular(soliplexRadii.sm),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: Row(
-                children: [
-                  Container(
-                    width: 24,
-                    height: 24,
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      '$badgeNumber',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onPrimaryContainer,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+          _NumberBadge(number: number),
+          const SizedBox(width: SoliplexSpacing.s3),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  ref.displayTitle,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w500,
                   ),
-                  SizedBox(width: SoliplexSpacing.s2),
-                  Expanded(
-                    child: Text(
-                      sourceReference.displayTitle,
-                      style: theme.textTheme.bodySmall,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (whereParts.isNotEmpty) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    whereParts.join(' · '),
+                    style: mono.copyWith(
+                      fontSize: 12,
+                      color: cs.onSurfaceVariant,
                     ),
-                  ),
-                  if (sourceReference.formattedPageNumbers != null) ...[
-                    const SizedBox(width: 4),
-                    Text(
-                      sourceReference.formattedPageNumbers!,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                  Icon(
-                    isExpanded ? Icons.expand_less : Icons.expand_more,
-                    size: 16,
-                    color: theme.colorScheme.onSurfaceVariant,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
-              ),
+                if (ref.content.isNotEmpty) ...[
+                  const SizedBox(height: SoliplexSpacing.s2),
+                  _QuoteBlock(
+                    text: _stripMarkdown(ref.content),
+                    accent: cs.primary,
+                  ),
+                ],
+              ],
             ),
           ),
-          if (isExpanded) _buildExpandedContent(context, theme),
+          const SizedBox(width: SoliplexSpacing.s1),
+          IconButton(
+            icon: const Icon(Icons.open_in_new, size: 18),
+            tooltip: 'Open source',
+            onPressed: () => _openSource(),
+            visualDensity: VisualDensity.compact,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildExpandedContent(BuildContext context, ThemeData theme) {
-    return Padding(
-      padding: EdgeInsets.only(
-        left: SoliplexSpacing.s8,
-        bottom: SoliplexSpacing.s2,
+  void _openSource() {
+    if (ref.isPdf && onShowChunkVisualization != null) {
+      onShowChunkVisualization!(ref);
+      return;
+    }
+    final uri = Uri.tryParse(ref.documentUri);
+    if (uri != null && uri.hasScheme) launchUrl(uri);
+  }
+}
+
+class _NumberBadge extends StatelessWidget {
+  const _NumberBadge({required this.number});
+
+  final int number;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final radii = SoliplexTheme.of(context).radii;
+    final mono = context.monospace;
+    return Container(
+      width: 24,
+      height: 24,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: cs.primary.withAlpha(31),
+        borderRadius: BorderRadius.circular(radii.sm),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (sourceReference.headings.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 4),
-              child: Text(
-                sourceReference.headings.join(' > '),
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          if (sourceReference.content.isNotEmpty)
-            Container(
-              constraints: const BoxConstraints(maxHeight: 250),
-              padding: EdgeInsets.all(SoliplexSpacing.s2),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(soliplexRadii.md),
-              ),
-              child: SingleChildScrollView(
-                child: FlutterMarkdownPlusRenderer(
-                  data: sourceReference.content,
-                  onLinkTap: (href, _) {
-                    final uri = Uri.tryParse(href);
-                    if (uri != null) launchUrl(uri);
-                  },
-                ),
-              ),
-            ),
-          if (sourceReference.documentUri.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(top: 4),
-              child: Text(
-                sourceReference.documentUri,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          if (sourceReference.isPdf && onShowChunkVisualization != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 4),
-              child: TextButton.icon(
-                onPressed: () => onShowChunkVisualization!(sourceReference),
-                icon: const Icon(Icons.picture_as_pdf, size: 16),
-                label: const Text('View in PDF'),
-                style: TextButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: SoliplexSpacing.s2),
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-              ),
-            ),
-        ],
+      child: Text(
+        '$number',
+        style: mono.copyWith(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: cs.primary,
+          height: 1,
+        ),
       ),
     );
   }
+}
+
+class _QuoteBlock extends StatelessWidget {
+  const _QuoteBlock({required this.text, required this.accent});
+
+  final String text;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final radii = SoliplexTheme.of(context).radii;
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: SoliplexSpacing.s3 - 2,
+        vertical: SoliplexSpacing.s2,
+      ),
+      decoration: BoxDecoration(
+        color: cs.surface,
+        border: Border(
+          left: BorderSide(color: accent.withAlpha(102), width: 2),
+        ),
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(radii.sm),
+          bottomRight: Radius.circular(radii.sm),
+        ),
+      ),
+      child: Text(
+        text,
+        style: theme.textTheme.bodySmall?.copyWith(
+          fontStyle: FontStyle.italic,
+          color: cs.onSurface,
+          height: 1.45,
+        ),
+        maxLines: 6,
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
+  }
+}
+
+/// Strips common markdown markers (bold, italic, inline code, headings, list
+/// bullets, link text) so that the resulting plain text reads cleanly inside
+/// the italic quote block. Citation chunks are typically short prose, not
+/// rich markdown — a regex pass is enough.
+String _stripMarkdown(String input) {
+  var out = input.trim();
+  out = out.replaceAll(RegExp(r'^\s*#+\s+', multiLine: true), '');
+  out = out.replaceAll(RegExp(r'^\s*[-+]\s+', multiLine: true), '');
+  out = out.replaceAllMapped(
+    RegExp(r'\[([^\]]+)\]\([^)]+\)'),
+    (m) => m.group(1)!,
+  );
+  out = out.replaceAllMapped(RegExp(r'\*+(.+?)\*+'), (m) => m.group(1)!);
+  out = out.replaceAllMapped(RegExp(r'__(.+?)__'), (m) => m.group(1)!);
+  out = out.replaceAllMapped(RegExp(r'`([^`]+)`'), (m) => m.group(1)!);
+  return out;
 }
