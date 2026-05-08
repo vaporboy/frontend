@@ -23,34 +23,40 @@ class LoadingMessageTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (executionTracker != null) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (streamingActivity != null)
-            ActivityIndicator(activity: streamingActivity!),
-          ExecutionTimeline(
-            roomId: roomId,
-            messageId: messageId,
-            tracker: executionTracker!,
-          ),
-          ExecutionThinkingBlock(
-            roomId: roomId,
-            messageId: messageId,
-            tracker: executionTracker!,
-          ),
-        ],
+      return Semantics(
+        liveRegion: true,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (streamingActivity != null)
+              ActivityIndicator(activity: streamingActivity!),
+            ExecutionTimeline(
+              roomId: roomId,
+              messageId: messageId,
+              tracker: executionTracker!,
+            ),
+            ExecutionThinkingBlock(
+              roomId: roomId,
+              messageId: messageId,
+              tracker: executionTracker!,
+            ),
+          ],
+        ),
       );
     }
-    return const Row(
-      children: [
-        SizedBox(
-          width: 16,
-          height: 16,
-          child: CircularProgressIndicator(strokeWidth: 2),
-        ),
-        SizedBox(width: 8),
-        Text('Thinking...'),
-      ],
+    return Semantics(
+      liveRegion: true,
+      child: const Row(
+        children: [
+          SizedBox(
+            width: 16,
+            height: 16,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+          SizedBox(width: 8),
+          Text('Thinking...'),
+        ],
+      ),
     );
   }
 }
