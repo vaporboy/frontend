@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:soliplex_frontend/src/design/theme/theme_extensions.dart';
+import 'package:soliplex_frontend/src/design/tokens/spacing.dart';
 import 'package:soliplex_frontend/src/modules/room/upload_tracker.dart';
 
 /// Transient inline notifications that announce upload transitions the
@@ -248,19 +249,26 @@ class _Pill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final radii = SoliplexTheme.of(context).radii;
     return Container(
-      margin: const EdgeInsets.only(left: 12, bottom: 4),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      margin: const EdgeInsets.only(
+        left: SoliplexSpacing.s3,
+        bottom: SoliplexSpacing.s1,
+      ),
+      padding: const EdgeInsets.symmetric(
+        horizontal: SoliplexSpacing.s3,
+        vertical: SoliplexSpacing.s2,
+      ),
       decoration: BoxDecoration(
         color: background,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(radii.xl),
       ),
       constraints: const BoxConstraints(maxWidth: 420),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 16, color: foreground),
-          const SizedBox(width: 8),
+          const SizedBox(width: SoliplexSpacing.s2),
           Flexible(
             child: Text(
               message,
@@ -271,9 +279,9 @@ class _Pill extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: SoliplexSpacing.s1),
           IconButton(
-            icon: const Icon(Icons.close, size: 14),
+            icon: const Icon(Icons.close, size: 16),
             color: foreground,
             onPressed: onDismiss,
             padding: EdgeInsets.zero,
