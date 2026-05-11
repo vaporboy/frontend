@@ -111,113 +111,31 @@ class _ChatInputState extends State<ChatInput> {
     final state = widget.sessionState?.watch(context);
     final active = _isActive(state);
     final disabled = !widget.enabled || active;
+    final cs = Theme.of(context).colorScheme;
 
     return Padding(
-      padding: EdgeInsets.all(SoliplexSpacing.s2),
+      padding: const EdgeInsets.all(SoliplexSpacing.s2),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (widget.selectedDocuments.isNotEmpty)
-            Container(
-              margin: const EdgeInsets.only(bottom: 4),
-              padding: EdgeInsets.all(SoliplexSpacing.s2),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceContainerLow,
-                borderRadius: BorderRadius.circular(soliplexRadii.sm),
-              ),
-              width: double.infinity,
-              child: _chipsExpanded
-                  ? Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        GestureDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onTap: () => setState(() => _chipsExpanded = false),
-                          child: Row(
-                            children: [
-                              const Spacer(),
-                              Text(
-                                'Hide',
-                                style: Theme.of(context).textTheme.bodySmall
-                                    ?.copyWith(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.primary,
-                                    ),
-                              ),
-                              Icon(
-                                Icons.expand_more,
-                                size: 16,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                            ],
-                          ),
-                        ),
-                        ConstrainedBox(
-                          constraints: const BoxConstraints(maxHeight: 160),
-                          child: SingleChildScrollView(
-                            child: Wrap(
-                              spacing: 4,
-                              runSpacing: 4,
-                              children: [
-                                for (final doc in widget.selectedDocuments)
-                                  Chip(
-                                    avatar: Icon(
-                                      getFileTypeIcon(documentIconPath(doc)),
-                                      size: 16,
-                                    ),
-                                    label: Text(documentDisplayName(doc)),
-                                    deleteIcon: const Icon(
-                                      Icons.close,
-                                      size: 16,
-                                    ),
-                                    onDeleted:
-                                        widget.onDocumentRemoved == null ||
-                                            disabled
-                                        ? null
-                                        : () => widget.onDocumentRemoved!(doc),
-                                    materialTapTargetSize:
-                                        MaterialTapTargetSize.shrinkWrap,
-                                    visualDensity: VisualDensity.compact,
-                                  ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    )
-                  : GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () => setState(() => _chipsExpanded = true),
-                      child: Row(
-                        children: [
-                          Text(
-                            '${widget.selectedDocuments.length} documents selected',
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                          ),
-                          const Spacer(),
-                          Icon(
-                            Icons.expand_less,
-                            size: 16,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                        ],
-                      ),
-                    ),
+            _AttachedDocsPanel(
+              documents: widget.selectedDocuments,
+              expanded: _chipsExpanded,
+              onToggle: () =>
+                  setState(() => _chipsExpanded = !_chipsExpanded),
+              onRemove: disabled ? null : widget.onDocumentRemoved,
             ),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               if (widget.onFilterTap != null)
                 IconButton(
                   icon: Icon(
                     Icons.filter_alt,
                     color: widget.selectedDocuments.isNotEmpty && !disabled
-                        ? Theme.of(context).colorScheme.primary
+                        ? cs.primary
                         : null,
                   ),
                   tooltip: 'Filter documents',
@@ -242,28 +160,130 @@ class _ChatInputState extends State<ChatInput> {
                     textInputAction: TextInputAction.newline,
                     decoration: const InputDecoration(
                       hintText: 'Type a message...',
-                      border: OutlineInputBorder(),
                     ),
                   ),
                 ),
               ),
-              SizedBox(width: SoliplexSpacing.s2),
+              const SizedBox(width: SoliplexSpacing.s2),
               if (active)
-                IconButton(
+                IconButton.filled(
                   icon: const Icon(Icons.stop),
+                  tooltip: 'Cancel',
                   onPressed: widget.onCancel,
+                  style: IconButton.styleFrom(
+                    backgroundColor: cs.error,
+                    foregroundColor: cs.onError,
+                  ),
                 )
               else
                 ValueListenableBuilder<TextEditingValue>(
                   valueListenable: _controller,
-                  builder: (context, value, _) => IconButton(
+                  builder: (context, value, _) => IconButton.filled(
                     icon: const Icon(Icons.send),
+                    tooltip: 'Send',
                     onPressed: value.text.trim().isEmpty || disabled
                         ? null
                         : _send,
                   ),
                 ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AttachedDocsPanel extends StatelessWidget {
+  const _AttachedDocsPanel({
+    required this.documents,
+    required this.expanded,
+    required this.onToggle,
+    required this.onRemove,
+  });
+
+  final Set<RagDocument> documents;
+  final bool expanded;
+  final VoidCallback onToggle;
+  final void Function(RagDocument doc)? onRemove;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final count = documents.length;
+    return Container(
+      margin: const EdgeInsets.only(bottom: SoliplexSpacing.s1),
+      padding: const EdgeInsets.all(SoliplexSpacing.s2),
+      decoration: BoxDecoration(
+        color: cs.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(soliplexRadii.md),
+      ),
+      width: double.infinity,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          InkWell(
+            onTap: onToggle,
+            borderRadius: BorderRadius.circular(soliplexRadii.sm),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: SoliplexSpacing.s1,
+              ),
+              child: Row(
+                children: [
+                  Text(
+                    '$count document${count == 1 ? '' : 's'} selected',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: cs.primary,
+                    ),
+                  ),
+                  const Spacer(),
+                  Icon(
+                    expanded ? Icons.expand_more : Icons.expand_less,
+                    size: 16,
+                    color: cs.primary,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          AnimatedSize(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+            alignment: Alignment.topCenter,
+            child: expanded
+                ? Padding(
+                    padding: const EdgeInsets.only(top: SoliplexSpacing.s2),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxHeight: 160),
+                      child: SingleChildScrollView(
+                        child: Wrap(
+                          spacing: SoliplexSpacing.s1,
+                          runSpacing: SoliplexSpacing.s1,
+                          children: [
+                            for (final doc in documents)
+                              Chip(
+                                avatar: Icon(
+                                  getFileTypeIcon(documentIconPath(doc)),
+                                  size: 16,
+                                ),
+                                label: Text(documentDisplayName(doc)),
+                                deleteIcon: const Icon(Icons.close, size: 16),
+                                onDeleted: onRemove == null
+                                    ? null
+                                    : () => onRemove!(doc),
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
+                                visualDensity: VisualDensity.compact,
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  )
+                : const SizedBox.shrink(),
           ),
         ],
       ),
