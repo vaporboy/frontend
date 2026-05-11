@@ -88,7 +88,7 @@ class _CodeBlock extends StatelessWidget {
               color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: SoliplexSpacing.s1),
           SelectableText(text, style: context.monospace.copyWith(fontSize: 13)),
         ],
       ),

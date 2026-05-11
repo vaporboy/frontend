@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart'
 import 'package:flutter/material.dart';
 import 'package:soliplex_agent/soliplex_agent.dart' hide State;
 
+import '../../../design/tokens/spacing.dart';
+
 enum _ThreadAction { rename, delete }
 
 class ThreadTile extends StatefulWidget {
@@ -96,7 +98,7 @@ class _ThreadTileState extends State<ThreadTile> {
           child: Row(
             children: [
               Icon(Icons.edit_outlined, size: 18),
-              SizedBox(width: 12),
+              SizedBox(width: SoliplexSpacing.s3),
               Text('Rename'),
             ],
           ),
@@ -110,7 +112,7 @@ class _ThreadTileState extends State<ThreadTile> {
                 size: 18,
                 color: theme.colorScheme.error,
               ),
-              SizedBox(width: 12),
+              SizedBox(width: SoliplexSpacing.s3),
               Text(
                 'Delete',
                 style: theme.textTheme.bodyMedium?.copyWith(

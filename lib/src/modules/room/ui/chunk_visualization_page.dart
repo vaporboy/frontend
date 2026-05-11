@@ -234,7 +234,7 @@ class _ChunkVisualizationPageState extends State<ChunkVisualizationPage> {
             'Failed to load visualization',
             style: theme.textTheme.bodyMedium,
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: SoliplexSpacing.s1),
           Text(
             error.toString(),
             style: theme.textTheme.bodySmall?.copyWith(
@@ -330,7 +330,7 @@ class _ChunkVisualizationPageState extends State<ChunkVisualizationPage> {
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               if (pages.length > 1) ...[
-                const SizedBox(height: 4),
+                const SizedBox(height: SoliplexSpacing.s1),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(pages.length, (index) {

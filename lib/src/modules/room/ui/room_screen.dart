@@ -709,7 +709,10 @@ class _RoomScreenState extends State<RoomScreen> {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 2),
       padding: isFailed
-          ? EdgeInsets.symmetric(horizontal: SoliplexSpacing.s2, vertical: 4)
+          ? EdgeInsets.symmetric(
+              horizontal: SoliplexSpacing.s2,
+              vertical: SoliplexSpacing.s1,
+            )
           : null,
       decoration: isFailed
           ? BoxDecoration(

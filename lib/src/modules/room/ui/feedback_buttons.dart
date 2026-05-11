@@ -133,7 +133,7 @@ class _FeedbackButtonsState extends State<FeedbackButtons>
               : theme.colorScheme.onSurfaceVariant,
           onTap: () => _onTap(FeedbackType.thumbsUp),
         ),
-        const SizedBox(width: 4),
+        const SizedBox(width: SoliplexSpacing.s1),
         _ThumbButton(
           tooltip: 'Thumbs down',
           icon: isDownActive ? Icons.thumb_down : Icons.thumb_down_alt_outlined,

@@ -43,7 +43,10 @@ class ThreadSidebar extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+          padding: const EdgeInsets.symmetric(
+            horizontal: SoliplexSpacing.s1,
+            vertical: SoliplexSpacing.s1,
+          ),
           child: Row(
             children: [
               TextButton.icon(
@@ -80,7 +83,7 @@ class ThreadSidebar extends StatelessWidget {
           icon: const Icon(Icons.info_outline, size: 16),
           label: Text(roomName),
           style: TextButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
+            padding: const EdgeInsets.symmetric(horizontal: SoliplexSpacing.s2),
             visualDensity: VisualDensity.compact,
           ),
         ),
@@ -89,7 +92,7 @@ class ThreadSidebar extends StatelessWidget {
           icon: const Icon(Icons.http, size: 16),
           label: const Text('Network Inspector'),
           style: TextButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
+            padding: const EdgeInsets.symmetric(horizontal: SoliplexSpacing.s2),
             visualDensity: VisualDensity.compact,
           ),
         ),

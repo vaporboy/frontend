@@ -74,7 +74,7 @@ class TextMessageTile extends StatelessWidget {
             color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: SoliplexSpacing.s1),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           decoration: BoxDecoration(
@@ -92,7 +92,7 @@ class TextMessageTile extends StatelessWidget {
               ? const Text('...')
               : FlutterMarkdownPlusRenderer(data: message.text),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: SoliplexSpacing.s1),
         Row(
           children: [
             CopyButton(text: message.text),
@@ -167,7 +167,7 @@ class _ThinkingBlock extends ConsumerWidget {
       ),
       dense: true,
       tilePadding: EdgeInsets.zero,
-      childrenPadding: const EdgeInsets.only(bottom: 4),
+      childrenPadding: const EdgeInsets.only(bottom: SoliplexSpacing.s1),
       children: [
         Text(
           text,

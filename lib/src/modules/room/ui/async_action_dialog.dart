@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 
+import '../../../design/tokens/spacing.dart';
+
 /// Dialog that runs an async action with loading/error states.
 ///
 /// Shows a spinner while in progress, inline error on failure,
@@ -83,7 +85,7 @@ class _AsyncActionDialogState extends State<AsyncActionDialog> {
           widget.contentBuilder(widget.canSubmit && !_busy ? _run : null),
           if (_error != null)
             Padding(
-              padding: const EdgeInsets.only(top: 8),
+              padding: const EdgeInsets.only(top: SoliplexSpacing.s2),
               child: Text(
                 _error!,
                 style: theme.textTheme.bodySmall?.copyWith(
@@ -100,7 +102,7 @@ class _AsyncActionDialogState extends State<AsyncActionDialog> {
         ),
         if (_busy)
           const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
+            padding: EdgeInsets.symmetric(horizontal: SoliplexSpacing.s4),
             child: SizedBox(
               width: 16,
               height: 16,
