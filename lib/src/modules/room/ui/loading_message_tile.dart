@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:soliplex_agent/soliplex_agent.dart' hide State;
 
+import '../../../design/tokens/spacing.dart';
 import '../execution_tracker.dart';
 import 'execution/activity_indicator.dart';
 import 'execution/execution_timeline.dart';
@@ -44,17 +45,24 @@ class LoadingMessageTile extends StatelessWidget {
         ),
       );
     }
+    final theme = Theme.of(context);
     return Semantics(
       liveRegion: true,
-      child: const Row(
+      child: Row(
         children: [
-          SizedBox(
+          const SizedBox(
             width: 16,
             height: 16,
             child: CircularProgressIndicator(strokeWidth: 2),
           ),
-          SizedBox(width: 8),
-          Text('Thinking...'),
+          const SizedBox(width: SoliplexSpacing.s2),
+          Text(
+            'Thinking...',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
         ],
       ),
     );
