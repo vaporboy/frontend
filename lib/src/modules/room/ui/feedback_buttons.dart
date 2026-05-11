@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:soliplex_client/soliplex_client.dart' show FeedbackType;
 
 import '../../../design/tokens/radii.dart';
+import '../../../design/tokens/spacing.dart';
 import 'feedback_reason_dialog.dart';
 
 enum _FeedbackPhase { idle, countdown, modal, submitted }
@@ -142,12 +143,12 @@ class _FeedbackButtonsState extends State<FeedbackButtons>
           onTap: () => _onTap(FeedbackType.thumbsDown),
         ),
         if (_phase == _FeedbackPhase.countdown) ...[
-          const SizedBox(width: 4),
+          const SizedBox(width: SoliplexSpacing.s1),
           _CountdownIndicator(
             controller: _controller,
             totalSeconds: widget.countdownSeconds,
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: SoliplexSpacing.s1),
           InkWell(
             onTap: _onTellUsWhyTap,
             borderRadius: BorderRadius.circular(soliplexRadii.xs),
